@@ -157,8 +157,18 @@ function debounce(func: () => void, wait: number) {
   }
 }
 
+// Ensure initAll only runs once per page load cycle
+let isInitialized = false;
+
 document.addEventListener('astro:page-load', () => {
-  initAll()
+  if (isInitialized) {
+    if (currentWave) {
+      currentWave.stop();
+    }
+  }
+  initAll();
+  isInitialized = true;
+  
   window.addEventListener(
     'resize',
     debounce(() => {
@@ -170,8 +180,9 @@ document.addEventListener('astro:page-load', () => {
   )
 });
 // Fallback for non-ViewTransitions
-if (!document.startViewTransition) {
+if (!document.startViewTransition && !isInitialized) {
     initAll()
+    isInitialized = true;
     window.addEventListener(
         'resize',
         debounce(() => {
@@ -181,9 +192,10 @@ if (!document.startViewTransition) {
         initAll()
         }, 100),
     )
-} else {
+} else if (!isInitialized) {
     // Also run on first load before view transition happens
     initAll()
+    isInitialized = true;
 }
 </script>
 

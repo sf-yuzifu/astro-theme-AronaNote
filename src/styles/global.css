@@ -31,17 +31,35 @@
 	font-display: swap;
 }
 body {
-	font-family: "Atkinson", sans-serif;
+	font-family: "Blueaka", "Atkinson", sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
+	background-image: var(--theme-background-image);
+	background-color: var(--general-background-color);
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-attachment: fixed;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	color: var(--font-color-grey);
+	transition: background-image 0.5s, background-color 0.5s;
 	font-size: 20px;
 	line-height: 1.7;
+}
+
+:root {
+  --theme-background-image: url('../assets/theme/background.svg');
+}
+
+:root[theme='dark'] {
+  --theme-background-image: url('../assets/theme/background_dark.svg');
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 main {
 	width: 720px;

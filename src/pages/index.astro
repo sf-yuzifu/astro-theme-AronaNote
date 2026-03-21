@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Banner from '../components/Banner.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 ---
 
@@ -11,8 +12,13 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
 	<body>
+		<Banner>
+			<div class="welcome-box">
+				<span class="welcome-text">Welcome to Astro Blog</span>
+			</div>
+		</Banner>
 		<Header />
-		<main>
+		<main class="container">
 			<h1>🧑‍🚀 Hello, Astronaut!</h1>
 			<p>
 				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
@@ -47,3 +53,23 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 		<Footer />
 	</body>
 </html>
+<style lang="less">
+.welcome-box {
+  margin-top: 4.2vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.welcome-text {
+  font-size: 4.5vw;
+  font-weight: bold;
+  color: var(--welcome-text-color);
+  text-shadow: var(--welcome-text-shadow);
+  text-align: center;
+  margin-bottom: 5vw;
+  user-select: none;
+}
+</style>

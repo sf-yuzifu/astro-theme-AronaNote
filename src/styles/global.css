@@ -49,6 +49,25 @@ body {
 	line-height: 1.7;
 }
 
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: rgba(var(--blue-shadow-color), 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(var(--blue-shadow-color), 0.8);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 :root {
   --theme-background-image: url('../assets/theme/background.svg');
 }

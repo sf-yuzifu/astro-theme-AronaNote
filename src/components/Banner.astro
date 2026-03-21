@@ -104,13 +104,13 @@ class SiriWave {
 
     this._drawLine(0.5, wave1Color, 1, 0.35, 6)
     this._drawLine(1, wave2Color, 1, 0.25, 6)
-    this.animationFrameID = requestAnimationFrame(this._draw.bind(this))
+    this.animationFrameID = requestAnimationFrame(() => this._draw())
   }
 
   start() {
-    this.phase = 0
-    this.run = true
-    this._draw()
+    this.phase = 0;
+    this.run = true;
+    this._draw();
   }
 
   stop() {
@@ -181,6 +181,9 @@ if (!document.startViewTransition) {
         initAll()
         }, 100),
     )
+} else {
+    // Also run on first load before view transition happens
+    initAll()
 }
 </script>
 

@@ -15,7 +15,7 @@ const menuList = [
 ];
 ---
 
-<header class:list={["container", { postViewer: isPost }]}>
+<header class:list={["container", { postViewer: isPost }]} style="view-transition-name: header;">
   <nav>
     <span class="logo">
       <a href="/">
@@ -42,7 +42,11 @@ const menuList = [
 header {
   height: 75vh;
   position: relative;
+  z-index: 100;
+  pointer-events: none; /* 让 Header 所在的 75vh 区域不要阻挡下方 Banner 的鼠标事件 */
+  
   nav {
+    pointer-events: auto; /* 恢复导航栏自身的鼠标事件 */
     display: flex;
     align-items: center;
     justify-content: space-between;

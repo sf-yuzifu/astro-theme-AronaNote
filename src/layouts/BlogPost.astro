@@ -67,7 +67,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			</div>
 		</Banner>
 		<Header isPost={true} />
-		<main class="container">
+		<main class="container" style="view-transition-name: fade-content;">
 			<article class="view-box">
 				<div class="prose">
 					<slot />

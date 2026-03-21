@@ -57,6 +57,34 @@ body {
   --theme-background-image: url('../assets/theme/background_dark.svg');
 }
 
+/* ViewTransitions 动画样式 */
+::view-transition-old(fade-content),
+::view-transition-old(fade-banner) {
+  animation: fade-out 0.3s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(fade-content),
+::view-transition-new(fade-banner) {
+  /* 延迟新元素的出现，直到旧元素动画结束 */
+  animation: fade-in 0.3s cubic-bezier(0, 0, 0.2, 1) 0.3s both;
+}
+
+/* 防止旧元素在新元素出现前被移除导致闪烁 */
+::view-transition-group(fade-content),
+::view-transition-group(fade-banner) {
+  animation-duration: 0.6s;
+}
+
+@keyframes fade-out {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 .container {
   max-width: 1200px;
   margin: 0 auto;

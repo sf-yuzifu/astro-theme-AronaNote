@@ -15,7 +15,7 @@ const menuList = [
 ];
 ---
 
-<header class:list={["container", { postViewer: isPost }]} style="view-transition-name: header;">
+<header class:list={["container", { postViewer: isPost }]}>
   <nav>
     <span class="logo">
       <a href="/">
@@ -31,6 +31,11 @@ const menuList = [
         ))}
       </ul>
     </span>
+    <div class="hamburger">
+      <span class="line"></span>
+      <span class="line"></span>
+      <span class="line"></span>
+    </div>
   </nav>
 </header>
 
@@ -67,34 +72,101 @@ header {
   }
 
   .logo {
-    img {
-      height: 32px;
-      width: auto;
-      filter: drop-shadow(0 0 8px #328cfa);
+      display: flex;
+      align-items: center;
+      height: 100%;
+      cursor: pointer;
+      a {
+        display: flex;
+        align-items: center;
+        height: 100%;
+      }
+      img {
+        height: 32px;
+        width: auto;
+        filter: drop-shadow(0 0 8px #328cfa);
+      }
     }
-  }
 
   .menu {
     ul {
+      width: 100%;
       display: flex;
-      list-style: none;
+      align-items: center;
+      justify-content: center;
       padding: 0;
       margin: 0;
+      list-style: none;
+
       li {
-        margin: 0 16px;
+        margin: 0 64px;
         a {
-          text-decoration: none;
+          display: block;
+          padding: 10px 16px;
+          border-radius: 8px;
+          font-size: 20px;
+          font-weight: 600;
           color: var(--font-color-grey);
-          font-weight: bold;
-          transition: color var(--transition-time);
-          &.active {
-            color: var(--color-blue);
-          }
+          transition: all 0.5s, transform 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+          text-decoration: none;
+
           &:hover {
-            color: var(--color-blue);
+            color: var(--font-color-gold);
+            background-color: var(--btn-background);
+            transform: translateY(-2px);
           }
         }
       }
+    }
+  }
+
+  .hamburger {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+  }
+
+  .hamburger .line {
+    display: block;
+    width: 80%;
+    height: 4px;
+    border-radius: 4px;
+    background-color: var(--font-color-grey);
+    margin-bottom: 4px;
+    -webkit-transition: all 0.3s ease-in-out;
+    transition: all 0.3s ease-in-out;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    nav {
+      height: 64px;
+    }
+
+    .logo {
+      img {
+        height: 32px;
+      }
+    }
+
+    .menu {
+      ul {
+        li {
+          margin: 0 10px;
+          a {
+            font-size: 16px;
+          }
+        }
+      }
+    }
+
+    .hamburger {
+      width: 32px;
     }
   }
 }

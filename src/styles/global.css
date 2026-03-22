@@ -153,7 +153,7 @@ html[theme='dark'] .expressive-code figure.frame .custom-copy-btn:hover {
 .expressive-code pre {
   background-color: transparent !important;
   margin: 0 !important;
-  padding: 16px !important;
+  padding: 16px 0 !important;
 }
 ::-webkit-scrollbar {
   width: 8px;

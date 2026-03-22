@@ -181,6 +181,16 @@ html[theme='dark'] .expressive-code figure.frame .custom-copy-btn:hover {
   --theme-background-image: url('../assets/theme/background_dark.svg');
 }
 
+:root {
+  view-transition-name: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-group(root) {
+  animation: none;
+}
+
 html.route-leaving main,
 html.route-leaving .banner-content {
   animation: route-out 0.26s cubic-bezier(0.4, 0, 1, 1) both;

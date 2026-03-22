@@ -190,17 +190,17 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
     }
 
     code {
-    font-family: "JetBrains Mono", monospace;
-    line-height: 1.5;
-    border-radius: 3px;
-    background-color: rgba(159, 219, 252, 0.2);
-    padding: 2px 4px;
-    color: var(--color-blue);
-    html[theme="dark"] & {
-      background-color: rgba(207, 198, 254, 0.2);
-      color: #cfc6ff;
+      font-family: "JetBrains Mono", monospace;
+      line-height: 1.5;
+      border-radius: 3px;
+      background-color: rgba(159, 219, 252, 0.2);
+      padding: 2px 4px;
+      color: var(--color-blue);
+      html[theme="dark"] & {
+        background-color: rgba(207, 198, 254, 0.2);
+        color: #cfc6ff;
+      }
     }
-  }
 
     h1,
     h2,
@@ -281,88 +281,96 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
       margin: 8px 0 0;
     }
 
-  img {
-    max-width: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  }
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
 
-  /* 覆盖 Astro 原生代码块的 code 样式，防止行内样式影响代码块 */
-  .expressive-code code {
-    background-color: transparent !important;
-    padding: 0 !important;
-    color: inherit !important;
+    /* 覆盖 Astro 原生代码块的 code 样式，防止行内样式影响代码块 */
+    .expressive-code code {
+      background-color: transparent !important;
+      padding: 0 !important;
+      color: inherit !important;
+    }
   }
-}
 </style>
 
 <script>
-// 自定义代码复制逻辑，拦截并替换默认的复制按钮
-document.addEventListener('astro:page-load', () => {
-  const codeBlocks = document.querySelectorAll('.expressive-code figure.frame');
-  
-  codeBlocks.forEach(block => {
-    // 检查是否已经添加过复制按钮，避免重复添加
-    if (block.querySelector('.custom-copy-btn')) return;
+  // 自定义代码复制逻辑，拦截并替换默认的复制按钮
+  document.addEventListener("astro:page-load", () => {
+    const codeBlocks = document.querySelectorAll(
+      ".expressive-code figure.frame",
+    );
 
-    // 移除原有的复制按钮（如果有）
-    const oldCopyBtn = block.querySelector('.copy');
-    if (oldCopyBtn) {
-      oldCopyBtn.remove();
-    }
+    codeBlocks.forEach((block) => {
+      // 检查是否已经添加过复制按钮，避免重复添加
+      if (block.querySelector(".custom-copy-btn")) return;
 
-    // 查找代码内容
-    const pre = block.querySelector('pre');
-    if (!pre) return;
+      // 移除原有的复制按钮（如果有）
+      const oldCopyBtn = block.querySelector(".copy");
+      if (oldCopyBtn) {
+        oldCopyBtn.remove();
+      }
 
-    // 创建新的复制按钮
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'custom-copy-btn';
-    copyBtn.title = 'Copy code';
-    copyBtn.setAttribute('aria-label', 'Copy code to clipboard');
+      // 查找代码内容
+      const pre = block.querySelector("pre");
+      if (!pre) return;
 
-    copyBtn.addEventListener('click', async () => {
-      try {
-        // Expressive Code 通常会将实际代码放在 class 为 "code" 的元素内，
-        // 而将行号放在其他地方。我们可以尝试提取所有的 .code 内容。
-        // 或者更简单地，它通常在 <button class="copy"> 上保存了 data-code 属性，
-        // 我们之前移除了它。所以现在我们通过遍历实际代码行来提取文本。
-        let codeText = '';
-        const codeLines = pre.querySelectorAll('.ec-line .code');
-        
-        if (codeLines.length > 0) {
+      // 创建新的复制按钮
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "custom-copy-btn";
+      copyBtn.title = "Copy code";
+      copyBtn.setAttribute("aria-label", "Copy code to clipboard");
+
+      copyBtn.addEventListener("click", async () => {
+        try {
+          // Expressive Code 通常会将实际代码放在 class 为 "code" 的元素内，
+          // 而将行号放在其他地方。我们可以尝试提取所有的 .code 内容。
+          // 或者更简单地，它通常在 <button class="copy"> 上保存了 data-code 属性，
+          // 我们之前移除了它。所以现在我们通过遍历实际代码行来提取文本。
+          let codeText = "";
+          const codeLines = pre.querySelectorAll(".ec-line .code");
+
+          if (codeLines.length > 0) {
             // 如果能找到具体的代码行，说明启用了行号等插件，我们只提取代码部分
-            const lines = Array.from(codeLines).map(line => line.textContent || '');
-            codeText = lines.join('\n');
-        } else {
+            const lines = Array.from(codeLines).map(
+              (line) => line.textContent || "",
+            );
+            codeText = lines.join("\n");
+          } else {
             // 回退到直接提取 pre 的文本
-            codeText = pre.textContent || '';
+            codeText = pre.textContent || "";
+          }
+
+          await navigator.clipboard.writeText(codeText);
+
+          copyBtn.classList.add("copied");
+          setTimeout(() => {
+            copyBtn.classList.remove("copied");
+          }, 2000);
+        } catch (err) {
+          console.error("Failed to copy text: ", err);
         }
-        
-        await navigator.clipboard.writeText(codeText);
-        
-        copyBtn.classList.add('copied');
-        setTimeout(() => {
-          copyBtn.classList.remove('copied');
-        }, 2000);
-      } catch (err) {
-        console.error('Failed to copy text: ', err);
+      });
+
+      block.appendChild(copyBtn);
+
+      // 强制注入语言标签
+      const header = block.querySelector("figcaption.header");
+      if (
+        header &&
+        !header.querySelector(".custom-lang-label") &&
+        !header.querySelector("span.title")
+      ) {
+        const lang = pre.getAttribute("data-language");
+        if (lang) {
+          const langLabel = document.createElement("span");
+          langLabel.className = "custom-lang-label title"; // 加上 title 类以复用已有样式
+          langLabel.textContent = lang;
+          header.appendChild(langLabel);
+        }
       }
     });
-
-    block.appendChild(copyBtn);
-
-    // 强制注入语言标签
-    const header = block.querySelector('figcaption.header');
-    if (header && !header.querySelector('.custom-lang-label') && !header.querySelector('span.title')) {
-      const lang = pre.getAttribute('data-language');
-      if (lang) {
-        const langLabel = document.createElement('span');
-        langLabel.className = 'custom-lang-label title'; // 加上 title 类以复用已有样式
-        langLabel.textContent = lang;
-        header.appendChild(langLabel);
-      }
-    }
   });
-});
 </script>

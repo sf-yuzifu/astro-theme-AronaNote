@@ -1,3 +1,8 @@
+# WIT
+
+Based on [vitepress-theme-bluearchive](https://github.com/Alittfre/vitepress-theme-bluearchive)
+
+
 # Astro Starter Kit: Blog
 
 ```sh

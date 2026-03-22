@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import navLogo from '../assets/theme/icon/navLogo.svg';
 import HeaderLink from './HeaderLink.astro';
+import RouteTransitionIsland from './RouteTransitionIsland.vue';
 
 interface Props {
   isPost?: boolean;
@@ -16,6 +17,7 @@ const menuList = [
 ];
 ---
 
+<RouteTransitionIsland client:load transition:persist />
 <header class:list={["container", { postViewer: isPost }]}>
   <nav transition:persist>
     <span class="logo">

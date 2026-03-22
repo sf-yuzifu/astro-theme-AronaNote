@@ -181,32 +181,14 @@ html[theme='dark'] .expressive-code figure.frame .custom-copy-btn:hover {
   --theme-background-image: url('../assets/theme/background_dark.svg');
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
+html.route-leaving main,
+html.route-leaving .banner-content {
+  animation: route-out 0.26s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
-::view-transition-group(fade-content) {
-  z-index: 30;
-}
-
-::view-transition-group(fade-banner-content) {
-  z-index: 20;
-}
-
-::view-transition-old(fade-content),
-::view-transition-old(fade-banner-content) {
-  animation: route-out 0.3s cubic-bezier(0.4, 0, 1, 1) both;
-}
-
-::view-transition-new(fade-content),
-::view-transition-new(fade-banner-content) {
-  animation: route-in 0.5s cubic-bezier(0, 0, 0.2, 1) 0.3s both;
-}
-
-::view-transition-group(fade-content),
-::view-transition-group(fade-banner-content) {
-  animation-duration: 0.8s;
+html.route-entering main,
+html.route-entering .banner-content {
+  animation: route-in 0.56s cubic-bezier(0, 0, 0.2, 1) both;
 }
 
 @keyframes route-out {

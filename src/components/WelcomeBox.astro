@@ -34,17 +34,26 @@ const social = [
   </div>
   </div>
 </div>
-<script define:vars={{ mottos }}>
-  function initWelcomeBox() {
-    const welcomeBoxContainer = document.getElementById('welcome-box-container');
+<script define:vars={{ mottos }} is:inline data-astro-rerun>
+  const runtimeWindow = window;
+
+  function bindWelcomeBox() {
     const welcomeBox = document.getElementById('welcome-box-el');
     const infoBox = document.getElementById('info-box-el');
     const mottoTextEl = document.getElementById('motto-text-el');
-    
-    if (!welcomeBoxContainer || !welcomeBox || !infoBox || !mottoTextEl) return;
+    if (!welcomeBox || !infoBox || !mottoTextEl) return false;
+
+    if (runtimeWindow.__welcomeBoxCleanup) {
+      runtimeWindow.__welcomeBoxCleanup();
+      runtimeWindow.__welcomeBoxCleanup = null;
+    }
+    if (runtimeWindow.__welcomeBoxTypingTimer) {
+      clearTimeout(runtimeWindow.__welcomeBoxTypingTimer);
+      runtimeWindow.__welcomeBoxTypingTimer = null;
+    }
 
     const multiple = 30;
-    
+
     function getMouseAngle(x, y) {
       const radians = Math.atan2(y, x);
       let angle = radians * (180 / Math.PI);
@@ -73,41 +82,58 @@ const social = [
       infoBox.style.background = `linear-gradient(0deg, var(--infobox-background-initial), var(--infobox-background-final))`; 
     };
 
+    welcomeBox.style.pointerEvents = 'auto';
+    welcomeBox.addEventListener('pointermove', parallax);
     welcomeBox.addEventListener('mousemove', parallax);
+    welcomeBox.addEventListener('pointerleave', reset);
     welcomeBox.addEventListener('mouseleave', reset);
+    runtimeWindow.__welcomeBoxCleanup = () => {
+      welcomeBox.removeEventListener('pointermove', parallax);
+      welcomeBox.removeEventListener('mousemove', parallax);
+      welcomeBox.removeEventListener('pointerleave', reset);
+      welcomeBox.removeEventListener('mouseleave', reset);
+    };
 
-    // 打字机效果
+    runtimeWindow.__welcomeBoxTypingToken = (runtimeWindow.__welcomeBoxTypingToken || 0) + 1;
+    const typingToken = runtimeWindow.__welcomeBoxTypingToken;
     let index = 0;
     const randomMotto = mottos[Math.floor(Math.random() * mottos.length)];
-    mottoTextEl.textContent = ''; // 清空初始内容
+    mottoTextEl.textContent = '';
 
     const addNextCharacter = () => {
+      if (typingToken !== runtimeWindow.__welcomeBoxTypingToken) return;
       if (index < randomMotto.length) {
         mottoTextEl.textContent += randomMotto[index];
         index++;
-        setTimeout(addNextCharacter, Math.random() * 150 + 50);
+        runtimeWindow.__welcomeBoxTypingTimer = setTimeout(addNextCharacter, Math.random() * 150 + 50);
       }
     };
-    
-    // 延迟一点开始打字机效果，等组件渲染完毕
-    setTimeout(addNextCharacter, 300);
-    
-    // 清理函数绑定到元素上以便于页面切换时清理
-    welcomeBox._cleanup = () => {
-        welcomeBox.removeEventListener('mousemove', parallax);
-        welcomeBox.removeEventListener('mouseleave', reset);
-    };
 
+    runtimeWindow.__welcomeBoxTypewriterPlayed = true;
+    runtimeWindow.__welcomeBoxTypingTimer = setTimeout(addNextCharacter, 220);
+    return true;
   }
 
-  // 页面加载或切换时初始化
-  document.addEventListener('astro:page-load', () => {
-      initWelcomeBox();
-  });
-  
-  if (!document.startViewTransition) {
-      initWelcomeBox();
+  function initWelcomeBox() {
+    bindWelcomeBox();
   }
+
+  function scheduleWelcomeBoxInit(retry = 0) {
+    requestAnimationFrame(() => {
+      initWelcomeBox();
+      const isReady = Boolean(document.getElementById('welcome-box-el')) && Boolean(runtimeWindow.__welcomeBoxCleanup);
+      if (!isReady && retry < 20) {
+        setTimeout(() => scheduleWelcomeBoxInit(retry + 1), 80);
+      }
+    });
+  }
+
+  if (!runtimeWindow.__welcomeBoxNavBound) {
+    document.addEventListener('astro:page-load', () => scheduleWelcomeBoxInit());
+    document.addEventListener('astro:after-swap', () => scheduleWelcomeBoxInit());
+    runtimeWindow.__welcomeBoxNavBound = true;
+  }
+  scheduleWelcomeBoxInit();
 </script>
 
 <style lang="less">
@@ -154,6 +180,7 @@ const social = [
   border-radius: 3vw;
   box-shadow: var(--info-box-shadow);
   backdrop-filter: var(--blur-val) saturate(120%);
+  background: linear-gradient(0deg, var(--infobox-background-initial), var(--infobox-background-final));
 
 
   .avatar {

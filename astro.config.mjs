@@ -2,6 +2,7 @@
 
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import vue from '@astrojs/vue';
 import { defineConfig } from 'astro/config';
 import astroExpressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
@@ -41,7 +42,8 @@ export default defineConfig({
 		}),
 		mdx({
 			remarkPlugins: [remarkReadingTime],
-		}), 
+		}),
+		vue(),
 		sitemap()
 	],
 });

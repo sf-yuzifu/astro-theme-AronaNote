@@ -49,7 +49,7 @@ const allTags = [...new Set(allPosts.map((post) => post.data.tags || []).flat())
       </ul>
     </Banner>
     <Header />
-    <main style="view-transition-name: fade-content;">
+    <main>
       <!-- 直接复用已经写好的 PostsList 组件，只需把过滤后的 posts 传给它 -->
       <PostsList posts={posts} />
     </main>

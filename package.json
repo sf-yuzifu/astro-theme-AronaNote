@@ -16,13 +16,15 @@
     "@astrojs/mdx": "^5.0.2",
     "@astrojs/rss": "^4.0.17",
     "@astrojs/sitemap": "^3.7.1",
+    "@astrojs/vue": "^6.0.1",
     "@expressive-code/plugin-line-numbers": "^0.41.7",
     "astro": "^6.0.8",
     "astro-expressive-code": "^0.41.7",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
     "sharp": "^0.34.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vue": "^3.5.30"
   },
   "devDependencies": {
     "less": "^4.6.4"

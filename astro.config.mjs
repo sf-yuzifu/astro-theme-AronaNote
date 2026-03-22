@@ -5,10 +5,14 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 import astroExpressiveCode from 'astro-expressive-code';
 import { pluginLineNumbers } from '@expressive-code/plugin-line-numbers'
+import { remarkReadingTime } from './src/utils/remarkReadingTime.mjs';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://example.com',
+	markdown: {
+		remarkPlugins: [remarkReadingTime],
+	},
 	integrations: [
 		astroExpressiveCode({
 			themes: ['github-light', 'github-dark'],

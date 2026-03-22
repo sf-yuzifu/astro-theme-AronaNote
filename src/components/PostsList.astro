@@ -1,16 +1,27 @@
 ---
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import FormattedDate from './FormattedDate.astro';
 
 const posts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+// 为所有文章提前渲染出 frontmatter，以获取 remark 插件注入的字数等信息
+const postsWithReadingTime = await Promise.all(
+  posts.map(async (post) => {
+    const { remarkPluginFrontmatter } = await render(post);
+    return {
+      ...post,
+      remarkPluginFrontmatter,
+    };
+  })
+);
 ---
 
 <div class="container posts-content">
   <div class="posts-list">
-    {posts.map((post) => (
+    {postsWithReadingTime.map((post) => (
       <article class="post">
         <header class="post-header">
           {post.data.heroImage && (
@@ -34,9 +45,16 @@ const posts = (await getCollection('blog')).sort(
             <div class="meta-info-bar">
               <span class="iconfont icon-time time"></span>
               <div class="time-info">
-                <FormattedDate date={post.data.pubDate} />
+                发布于 <FormattedDate date={post.data.pubDate} />
               </div>
               <div class="seperator"></div>
+              {post.remarkPluginFrontmatter.wordCount && (
+                <>
+                  <div class="time-info">约 {post.remarkPluginFrontmatter.wordCount} 字</div>
+                  <div class="seperator"></div>
+                  <div class="time-info">{post.remarkPluginFrontmatter.minutesRead}</div>
+                </>
+              )}
             </div>
             {/* TODO: Tags if they exist in Astro schema */}
             <div class="excerpt">

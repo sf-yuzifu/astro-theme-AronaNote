@@ -63,3 +63,71 @@ const { title, description, image = FallbackImage } = Astro.props;
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
 <meta property="twitter:image" content={new URL(image.src, Astro.url)} />
+
+<script is:inline>
+	(() => {
+		if (window.__ecCopyDelegateBound) return
+		window.__ecCopyDelegateBound = true
+
+		const fallbackCopy = (text) => {
+			const pre = document.createElement('pre')
+			Object.assign(pre.style, {
+				opacity: '0',
+				pointerEvents: 'none',
+				position: 'absolute',
+				overflow: 'hidden',
+				left: '0',
+				top: '0',
+				width: '20px',
+				height: '20px',
+				webkitUserSelect: 'auto',
+				userSelect: 'all',
+			})
+			pre.ariaHidden = 'true'
+			pre.textContent = text
+			document.body.appendChild(pre)
+			const range = document.createRange()
+			range.selectNode(pre)
+			const selection = getSelection()
+			if (!selection) {
+				document.body.removeChild(pre)
+				return false
+			}
+			selection.removeAllRanges()
+			selection.addRange(range)
+			let copied = false
+			try {
+				copied = document.execCommand('copy')
+			} finally {
+				selection.removeAllRanges()
+				document.body.removeChild(pre)
+			}
+			return copied
+		}
+
+		const showFeedback = (button) => {
+			button.classList.add('copied')
+			const clearCopied = () => button.classList.remove('copied')
+			setTimeout(clearCopied, 1500)
+			button.addEventListener('blur', clearCopied, { once: true })
+		}
+
+		document.addEventListener('click', async (event) => {
+			const target = event.target
+			if (!(target instanceof Element)) return
+			const button = target.closest('.expressive-code .copy button')
+			if (!(button instanceof HTMLButtonElement)) return
+			const code = (button.dataset.code || '').replace(/\u007f/g, '\n')
+			if (!code) return
+
+			let copied = false
+			try {
+				await navigator.clipboard.writeText(code)
+				copied = true
+			} catch {
+				copied = fallbackCopy(code)
+			}
+			if (copied) showFeedback(button)
+		})
+	})()
+</script>

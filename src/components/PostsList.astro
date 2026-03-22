@@ -3,9 +3,18 @@ import { Image } from "astro:assets";
 import { getCollection, render } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 
-const posts = (await getCollection("blog")).sort(
-  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+interface Props {
+  posts?: any[];
+}
+
+let posts = Astro.props.posts;
+
+// 如果没有传入 posts，则默认获取全部 blog 集合
+if (!posts) {
+  posts = (await getCollection("blog")).sort(
+    (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+  );
+}
 
 // 为所有文章提前渲染出 frontmatter，以获取 remark 插件注入的字数等信息
 const postsWithReadingTime = await Promise.all(
@@ -63,14 +72,19 @@ const postsWithReadingTime = await Promise.all(
               </div>
               {post.data.tags && post.data.tags.length > 0 && (
                 <ul class="tags">
-                  {post.data.tags.map((tag) => (
+                  {post.data.tags.map((tag: string) => (
                     <li>
                       <a href={`/tags/${tag}`}>{tag}</a>
                     </li>
                   ))}
                 </ul>
               )}
-              <div class:list={["excerpt", { "has-tags": post.data.tags && post.data.tags.length > 0 }]}>
+              <div
+                class:list={[
+                  "excerpt",
+                  { "has-tags": post.data.tags && post.data.tags.length > 0 },
+                ]}
+              >
                 <p>{post.data.description}</p>
               </div>
             </div>

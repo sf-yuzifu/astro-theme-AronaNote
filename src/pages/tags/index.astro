@@ -1,0 +1,92 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import Banner from "../../components/Banner.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+import { getCollection } from "astro:content";
+
+// 获取全量 tags
+const allPosts = await getCollection("blog");
+const allTags = [
+  ...new Set(allPosts.map((post) => post.data.tags || []).flat()),
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={`Tags | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+  </head>
+  <body>
+    <Banner>
+      <!-- Tags 卡片显示在 Banner 中，此时没有选中的 active tag -->
+      <ul class="tags-container">
+        {
+          allTags.map((t) => (
+            <li class="item">
+              <a href={`/tags/${t}`}>
+                <i class="iconfont icon-tag" /> {t}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </Banner>
+    <Header />
+    <main style="view-transition-name: fade-content;"></main>
+    <Footer />
+  </body>
+</html>
+
+<style lang="less">
+  .tags-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    padding: 16px;
+    background-color: var(--infobox-background-initial);
+    border-radius: 32px;
+    border: solid 2px var(--foreground-color);
+    backdrop-filter: var(--blur-val);
+    width: 768px;
+    z-index: 100;
+    list-style: none;
+    margin: 0;
+
+    li {
+      margin: 8px;
+
+      a {
+        color: var(--font-color-grey);
+        padding: 3px 5px;
+        color: var(--font-color-gold);
+        background-color: var(--btn-background);
+        border-radius: 5px;
+        transition: background-color 0.5s;
+        text-decoration: none;
+
+        &:hover {
+          background-color: var(--btn-hover);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .tags-container {
+      width: auto;
+      li {
+        margin: 4px;
+        a {
+          font-size: 12px;
+          .icon-tag {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+  }
+</style>

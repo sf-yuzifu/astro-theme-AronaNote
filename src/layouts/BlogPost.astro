@@ -323,7 +323,22 @@ document.addEventListener('astro:page-load', () => {
 
     copyBtn.addEventListener('click', async () => {
       try {
-        const codeText = pre.textContent || '';
+        // Expressive Code 通常会将实际代码放在 class 为 "code" 的元素内，
+        // 而将行号放在其他地方。我们可以尝试提取所有的 .code 内容。
+        // 或者更简单地，它通常在 <button class="copy"> 上保存了 data-code 属性，
+        // 我们之前移除了它。所以现在我们通过遍历实际代码行来提取文本。
+        let codeText = '';
+        const codeLines = pre.querySelectorAll('.ec-line .code');
+        
+        if (codeLines.length > 0) {
+            // 如果能找到具体的代码行，说明启用了行号等插件，我们只提取代码部分
+            const lines = Array.from(codeLines).map(line => line.textContent || '');
+            codeText = lines.join('\n');
+        } else {
+            // 回退到直接提取 pre 的文本
+            codeText = pre.textContent || '';
+        }
+        
         await navigator.clipboard.writeText(codeText);
         
         copyBtn.classList.add('copied');

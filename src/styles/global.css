@@ -34,6 +34,9 @@ body {
 	font-family: "Blueaka", "Atkinson", sans-serif;
 	margin: 0;
 	padding: 0;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 	text-align: left;
 	background-image: var(--theme-background-image);
 	background-color: var(--general-background-color);
@@ -230,7 +233,9 @@ html.route-skip-banner.route-entering .banner-content {
 }
 main {
 	margin: auto;
+  width: calc(100% - 2em);
 	padding: 0 1em;
+	flex: 1;
 }
 h1,
 h2,

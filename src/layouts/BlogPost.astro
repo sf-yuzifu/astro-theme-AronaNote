@@ -1,91 +1,57 @@
 ---
 import { Image } from "astro:assets";
 import type { CollectionEntry } from "astro:content";
-import BaseHead from "../components/BaseHead.astro";
-import Footer from "../components/Footer.astro";
+import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/FormattedDate.astro";
-import Header from "../components/Header.astro";
-import Banner from "../components/Banner.astro";
 
-type Props = CollectionEntry<"blog">["data"];
+type Props = CollectionEntry<"blog">["data"] & {
+  minutesRead?: string;
+  wordCount?: number;
+};
 
-const { title, description, pubDate, updatedDate, heroImage, minutesRead, wordCount } = Astro.props;
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  heroImage,
+  minutesRead,
+  wordCount,
+} = Astro.props;
 ---
 
-<html lang="en">
-  <head>
-    <BaseHead title={title} description={description} />
-    <style>
-      main {
-        width: calc(100% - 2em);
-        max-width: 100%;
-        margin: 0;
+<BaseLayout
+  title={title}
+  description={description}
+  isPost={true}
+  coverImage={heroImage}
+>
+  <!-- Banner内容 - 文章标题信息 -->
+  <div slot="banner-content" class="post-banner">
+    <h1 class="title">{title}</h1>
+    <span class="status">
+      发布于 <FormattedDate date={pubDate} />
+      {
+        updatedDate && (
+          <span>
+            {" "}
+            | 更新于 <FormattedDate date={updatedDate} />
+          </span>
+        )
       }
-      .hero-image {
-        width: 100%;
-      }
-      .hero-image img {
-        display: block;
-        margin: 0 auto;
-        border-radius: 12px;
-        box-shadow: var(--box-shadow);
-      }
-      .prose {
-        width: 720px;
-        max-width: calc(100% - 2em);
-        margin: auto;
-        padding: 1em;
-        color: rgb(var(--gray-dark));
-      }
-      .title {
-        margin-bottom: 1em;
-        padding: 1em 0;
-        text-align: center;
-        line-height: 1;
-      }
-      .title h1 {
-        margin: 0 0 0.5em 0;
-      }
-      .date {
-        margin-bottom: 0.5em;
-        color: rgb(var(--gray));
-      }
-      .last-updated-on {
-        font-style: italic;
-      }
-    </style>
-  </head>
+      {wordCount && <span> | 约 {wordCount} 字</span>}
+      {minutesRead && <span> | {minutesRead}</span>}
+    </span>
+  </div>
 
-  <body>
-    <Banner isPost={true} coverImage={heroImage}>
-      <div class="post-banner">
-        <h1 class="title">{title}</h1>
-        <span class="status">
-          发布于 <FormattedDate date={pubDate} />
-          {
-            updatedDate && (
-              <span>
-                {" "}
-                | 更新于 <FormattedDate date={updatedDate} />
-              </span>
-            )
-          }
-          {wordCount && <span> | 约 {wordCount} 字</span>}
-          {minutesRead && <span> | {minutesRead}</span>}
-        </span>
-      </div>
-    </Banner>
-    <Header isPost={true} />
-    <main class="container">
-      <article class="view-box">
-        <div class="content">
-          <slot />
-        </div>
-      </article>
-    </main>
-    <Footer />
-  </body>
-</html>
+  <!-- 主内容 - 文章内容 -->
+  <article class="view-box">
+    <div class="content">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
 <style lang="less" is:global>
   .post-banner {
     display: flex;
@@ -122,6 +88,8 @@ const { title, description, pubDate, updatedDate, heroImage, minutesRead, wordCo
 
   .view-box {
     box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1200px;
     position: relative;
     padding: 36px;
     border-radius: 32px;
@@ -134,167 +102,31 @@ const { title, description, pubDate, updatedDate, heroImage, minutesRead, wordCo
       border 0.5s,
       background 0.5s,
       box-shadow 0.5s;
-    margin: 50px auto 0;
-    max-width: 1200px;
+
+    .content {
+      background-image:
+        linear-gradient(90deg, rgba(159, 219, 252, 0.15) 3%, transparent 0),
+        linear-gradient(1turn, rgba(159, 219, 252, 0.15) 3%, transparent 0);
+      background-size: 20px 20px;
+      background-position: 50%;
+      html[theme="dark"] & {
+        background-image:
+          linear-gradient(90deg, rgba(207, 198, 254, 0.08) 3%, transparent 0),
+          linear-gradient(1turn, rgba(207, 198, 254, 0.08) 3%, transparent 0);
+      }
+      line-height: 1.8;
+
+      p {
+        margin: 16px 0;
+        line-height: 28px;
+      }
+    }
   }
 
-  .content {
-    background-image:
-      linear-gradient(90deg, rgba(159, 219, 252, 0.15) 3%, transparent 0),
-      linear-gradient(1turn, rgba(159, 219, 252, 0.15) 3%, transparent 0);
-    background-size: 20px 20px;
-    background-position: 50%;
-    color: var(--font-color-grey);
-
-    html[theme="dark"] & {
-      background-image:
-        linear-gradient(90deg, rgba(207, 198, 254, 0.08) 3%, transparent 0),
-        linear-gradient(1turn, rgba(207, 198, 254, 0.08) 3%, transparent 0);
-    }
-
-    p,
-    summary {
-      margin: 16px 0;
-    }
-
-    p {
-      line-height: 28px;
-    }
-
-    blockquote {
-      margin: 16px 0;
-      border-left: 3px solid #5cd3ff;
-      padding-left: 16px;
-      background-color: #5cd4ff25;
-      border-radius: 8px;
-      html[theme="dark"] & {
-        background-color: rgba(157, 124, 216, 0.1);
-        border-left: 3px solid #9d7cd8;
-      }
-    }
-    blockquote > p {
-      margin: 0;
-      font-size: 16px;
-    }
-
-    a {
-      font-weight: 500;
-      color: var(--color-blue);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-      transition:
-        color 0.25s,
-        opacity 0.25s;
-    }
-
-    strong {
-      font-weight: 600;
-    }
-
-    code {
-      font-family: "JetBrains Mono", monospace;
-      line-height: 1.5;
-      border-radius: 3px;
-      background-color: rgba(159, 219, 252, 0.2);
-      padding: 2px 4px;
-      color: var(--color-blue);
-      html[theme="dark"] & {
-        background-color: rgba(207, 198, 254, 0.2);
-        color: #cfc6ff;
-      }
-    }
-
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      position: relative;
-      font-weight: 600;
-      outline: none;
-      color: var(--font-color-grey);
-    }
-
-    h1 {
-      letter-spacing: -0.02em;
-      line-height: 40px;
-      font-size: 28px;
-    }
-
-    h2 {
-      margin: 48px 0 16px;
-      border-top: 2px solid #ced4da;
-      padding-top: 24px;
-      letter-spacing: -0.02em;
-      line-height: 32px;
-      font-size: 24px;
-    }
-
-    h3 {
-      margin: 32px 0 0;
-      letter-spacing: -0.01em;
-      line-height: 28px;
-      font-size: 20px;
-    }
-
-    h4,
-    h5,
-    h6 {
-      margin: 0;
-      line-height: 24px;
-      font-size: 16px;
-    }
-
-    @media (min-width: 768px) {
-      h1 {
-        font-size: 32px;
-      }
-    }
-
-    hr {
-      border: 0;
-      border-top: 2px dashed #ced4da;
-      html[theme="dark"] & {
-        border-top: 2px dashed rgba(157, 124, 216, 0.3);
-      }
-    }
-
-    ul,
-    ol {
-      padding-left: 1.25rem;
-      margin: 16px 0;
-    }
-
-    ul {
-      list-style: disc;
-    }
-
-    ol {
-      list-style: decimal;
-    }
-
-    li + li {
-      margin-top: 8px;
-    }
-
-    li > ol,
-    li > ul {
-      margin: 8px 0 0;
-    }
-
-    img {
-      max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    /* 覆盖 Astro 原生代码块的 code 样式，防止行内样式影响代码块 */
-    .expressive-code code {
-      background-color: transparent !important;
-      padding: 0 !important;
-      color: inherit !important;
+  @media (max-width: 768px) {
+    .view-box {
+      padding: 24px;
+      border-radius: 32px;
     }
   }
 </style>
-

@@ -1,0 +1,128 @@
+---
+// 基础布局 - 所有页面共享的外壳结构
+// 参考vitepress-theme-bluearchive的Layout.vue设计
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import Banner from '../components/Banner.astro';
+import Splash from '../components/Splash.astro';
+import '../styles/index.less';
+
+interface Props {
+  title: string;
+  description: string;
+  isPost?: boolean;
+  coverImage?: { src: string } | string;
+}
+
+const { title, description, isPost = false, coverImage } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+  </head>
+  <body>
+    <!-- <Splash /> -->
+    
+    <!-- Banner区域 - 保持持久化 -->
+    <Banner isPost={isPost} coverImage={coverImage} transition:persist="banner">
+      <div id="banner-content" class="banner-content-wrapper">
+        <slot name="banner-content" />
+      </div>
+    </Banner>
+    
+    <!-- Header导航 - 保持持久化 -->
+    <Header isPost={isPost} transition:persist="header" />
+    
+    <!-- 主要内容区域 - 切换时带动画 -->
+    <main id="main-content" class="main-content-wrapper" transition:animate="fade">
+      <slot />
+    </main>
+    
+    <!-- Footer - 保持持久化 -->
+    <Footer transition:persist="footer" />
+  </body>
+</html>
+
+<style is:global>
+  /* ===== 页面切换动画 - 类似Vue的fade过渡 ===== */
+  
+  /* 默认的fade动画覆盖 */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  /* 内容区域淡入淡出动画 */
+  ::view-transition-group(main-content) {
+    animation-duration: 500ms;
+  }
+
+  ::view-transition-old(main-content) {
+    animation: fadeOut 500ms ease-in-out forwards;
+  }
+
+  ::view-transition-new(main-content) {
+    animation: fadeIn 500ms ease-in-out forwards;
+  }
+
+  /* Banner内容区域动画 */
+  ::view-transition-old(banner-content) {
+    animation: fadeOut 500ms ease-in-out forwards;
+  }
+
+  ::view-transition-new(banner-content) {
+    animation: fadeIn 500ms ease-in-out forwards;
+  }
+
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* 确保持久化元素不参与view transition动画 */
+  [transition-persist="banner"],
+  [transition-persist="header"],
+  [transition-persist="footer"] {
+    view-transition-name: none !important;
+  }
+
+  /* 内容区域基础样式 */
+  .main-content-wrapper {
+    min-height: 50vh;
+  }
+
+  .banner-content-wrapper {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 减少动画偏好支持 */
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-old(main-content),
+    ::view-transition-new(main-content),
+    ::view-transition-old(banner-content),
+    ::view-transition-new(banner-content) {
+      animation: none;
+    }
+  }
+</style>

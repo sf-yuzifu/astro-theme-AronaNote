@@ -5,293 +5,416 @@ interface Props {
 }
 
 const { coverImage, isPost = false } = Astro.props;
-
-// 解析传入的图片路径
-const coverUrl = coverImage ? (typeof coverImage === 'string' ? coverImage : coverImage.src) : '';
 ---
 
-<div
-  class:list={["banner", { postViewer: isPost }]}
->
+<div class:list={["banner", { postViewer: isPost }]}>
   <div class="banner-content">
     <slot />
   </div>
 
   <canvas id="wave" transition:persist></canvas>
-  {/* 如果传入了文章封面，将只显示封面图片作为背景 */}
-  {coverUrl ? (
-    <div class="bg-img" style={`background-image: url(${coverUrl}) !important;`}></div>
-  ) : (
-    <div class="bg-img"></div>
-  )}
+
+  {/* 双背景图片层，实现平滑切换 */}
+  <div id="bg-layer-current" class="bg-layer" transition:persist></div>
+  <div
+    id="bg-layer-next"
+    class="bg-layer"
+    transition:persist
+  >
+  </div>
 </div>
 
 <script>
-class SiriWave {
-  K: number
-  F: number
-  speed: number
-  noise: number
-  phase: number
-  devicePixelRatio: number
-  width: number
-  height: number
-  MAX: number
-  canvas: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
-  run: boolean
-  animationFrameID: number | null
+  class SiriWave {
+    K: number;
+    F: number;
+    speed: number;
+    noise: number;
+    phase: number;
+    devicePixelRatio: number;
+    width: number;
+    height: number;
+    MAX: number;
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    run: boolean;
+    animationFrameID: number | null;
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.K = 1
-    this.F = 15
-    this.speed = 0.1
-    this.noise = 30
-    this.phase = 0
-    this.devicePixelRatio = window.devicePixelRatio || 1
-    this.width = this.devicePixelRatio * window.innerWidth
-    this.height = this.devicePixelRatio * 100
-    this.MAX = this.height / 2
-    this.canvas = canvas
-    this.ctx = this.canvas.getContext('2d')!
-    this.run = false
-    this.animationFrameID = null
-    this.resize()
-  }
-
-  _globalAttenuationFn(x: number) {
-    return Math.pow((this.K * 4) / (this.K * 4 + Math.pow(x, 4)), this.K * 2)
-  }
-
-  _drawLine(attenuation: number, color: string, width: number, noise: number, F: number) {
-    this.ctx.moveTo(0, 0)
-    this.ctx.beginPath()
-    this.ctx.strokeStyle = color
-    this.ctx.lineWidth = width || 1
-    F = F || this.F
-    noise = noise * this.MAX || this.noise
-    for (let i = -this.K; i <= this.K; i += 0.01) {
-      i = parseFloat(i.toFixed(2))
-      const x = this.width * ((i + this.K) / (this.K * 2))
-      const y =
-        this.height / 2 +
-        noise * Math.pow(Math.sin(i * 10 * attenuation), 1) * Math.sin(F * i - this.phase)
-      this.ctx.lineTo(x, y)
+    constructor(canvas: HTMLCanvasElement) {
+      this.K = 1;
+      this.F = 15;
+      this.speed = 0.1;
+      this.noise = 30;
+      this.phase = 0;
+      this.devicePixelRatio = window.devicePixelRatio || 1;
+      this.width = this.devicePixelRatio * window.innerWidth;
+      this.height = this.devicePixelRatio * 100;
+      this.MAX = this.height / 2;
+      this.canvas = canvas;
+      this.ctx = this.canvas.getContext("2d")!;
+      this.run = false;
+      this.animationFrameID = null;
+      this.resize();
     }
-    this.ctx.lineTo(this.width, this.height)
-    this.ctx.lineTo(0, this.height)
-    this.ctx.fillStyle = color
-    this.ctx.fill()
-  }
 
-  _clear() {
-    this.ctx.globalCompositeOperation = 'destination-out'
-    this.ctx.fillRect(0, 0, this.width, this.height)
-    this.ctx.globalCompositeOperation = 'source-over'
-  }
-
-  _draw() {
-    if (!this.run) {
-      return
+    _globalAttenuationFn(x: number) {
+      return Math.pow((this.K * 4) / (this.K * 4 + Math.pow(x, 4)), this.K * 2);
     }
-    this.phase = (this.phase + this.speed) % (Math.PI * 64)
-    this._clear()
-    const wave1Color = getComputedStyle(document.documentElement)
-      .getPropertyValue('--wave-color1')
-      .trim() || 'rgba(234, 239, 245, 0.8)'
-    const wave2Color = getComputedStyle(document.documentElement)
-      .getPropertyValue('--wave-color2')
-      .trim() || 'rgba(234, 239, 245, 0.5)'
 
-    this._drawLine(0.5, wave1Color, 1, 0.35, 6)
-    this._drawLine(1, wave2Color, 1, 0.25, 6)
-    this.animationFrameID = requestAnimationFrame(() => this._draw())
-  }
+    _drawLine(
+      attenuation: number,
+      color: string,
+      width: number,
+      noise: number,
+      F: number,
+    ) {
+      this.ctx.moveTo(0, 0);
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = color;
+      this.ctx.lineWidth = width || 1;
+      F = F || this.F;
+      noise = noise * this.MAX || this.noise;
+      for (let i = -this.K; i <= this.K; i += 0.01) {
+        i = parseFloat(i.toFixed(2));
+        const x = this.width * ((i + this.K) / (this.K * 2));
+        const y =
+          this.height / 2 +
+          noise *
+            Math.pow(Math.sin(i * 10 * attenuation), 1) *
+            Math.sin(F * i - this.phase);
+        this.ctx.lineTo(x, y);
+      }
+      this.ctx.lineTo(this.width, this.height);
+      this.ctx.lineTo(0, this.height);
+      this.ctx.fillStyle = color;
+      this.ctx.fill();
+    }
 
-  start() {
-    if (this.run) return
-    this.run = true
-    this._draw()
-  }
+    _clear() {
+      this.ctx.globalCompositeOperation = "destination-out";
+      this.ctx.fillRect(0, 0, this.width, this.height);
+      this.ctx.globalCompositeOperation = "source-over";
+    }
 
-  stop() {
-    this.run = false
-    this._clear()
-    if (this.animationFrameID !== null) {
-      cancelAnimationFrame(this.animationFrameID)
-      this.animationFrameID = null
+    _draw() {
+      if (!this.run) {
+        return;
+      }
+      this.phase = (this.phase + this.speed) % (Math.PI * 64);
+      this._clear();
+      const wave1Color =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--wave-color1")
+          .trim() || "rgba(234, 239, 245, 0.8)";
+      const wave2Color =
+        getComputedStyle(document.documentElement)
+          .getPropertyValue("--wave-color2")
+          .trim() || "rgba(234, 239, 245, 0.5)";
+
+      this._drawLine(0.5, wave1Color, 1, 0.35, 6);
+      this._drawLine(1, wave2Color, 1, 0.25, 6);
+      this.animationFrameID = requestAnimationFrame(() => this._draw());
+    }
+
+    start() {
+      if (this.run) return;
+      this.run = true;
+      this._draw();
+    }
+
+    stop() {
+      this.run = false;
+      this._clear();
+      if (this.animationFrameID !== null) {
+        cancelAnimationFrame(this.animationFrameID);
+        this.animationFrameID = null;
+      }
+    }
+
+    setNoise(v: number) {
+      this.noise = Math.min(v, 1) * this.MAX;
+    }
+
+    setSpeed(v: number) {
+      this.speed = v;
+    }
+
+    set(noise: number, speed: number) {
+      this.setNoise(noise);
+      this.setSpeed(speed);
+    }
+
+    resize() {
+      this.devicePixelRatio = window.devicePixelRatio || 1;
+      this.width = this.devicePixelRatio * window.innerWidth;
+      this.height = this.devicePixelRatio * 100;
+      this.MAX = this.height / 2;
+      this.canvas.width = this.width;
+      this.canvas.height = this.height;
+      this.canvas.style.width = this.width / this.devicePixelRatio + "px";
+      this.canvas.style.height = this.height / this.devicePixelRatio + "px";
+    }
+
+    attachCanvas(canvas: HTMLCanvasElement) {
+      this.canvas = canvas;
+      this.ctx = this.canvas.getContext("2d")!;
+      this.resize();
     }
   }
 
-  setNoise(v: number) {
-    this.noise = Math.min(v, 1) * this.MAX
+  type BannerWindow = Window & {
+    __bannerIntroPlayed?: boolean;
+    __siriWave?: SiriWave;
+    __siriWaveResizeBound?: boolean;
+    __currentBgUrl?: string;
+    __isBgTransitioning?: boolean;
+  };
+
+  const runtimeWindow = window as BannerWindow;
+
+  function applyIntroAnimation() {
+    const bannerEl = document.querySelector(".banner") as HTMLElement | null;
+    if (!bannerEl) return;
+
+    if (!runtimeWindow.__bannerIntroPlayed) {
+      bannerEl.classList.add("loadingComplete");
+      runtimeWindow.__bannerIntroPlayed = true;
+    } else {
+      bannerEl.classList.remove("loadingComplete");
+    }
   }
 
-  setSpeed(v: number) {
-    this.speed = v
+  function initWave() {
+    const waveCanvas = document.getElementById(
+      "wave",
+    ) as HTMLCanvasElement | null;
+    if (!waveCanvas) return;
+
+    if (runtimeWindow.__siriWave) {
+      runtimeWindow.__siriWave.attachCanvas(waveCanvas);
+      runtimeWindow.__siriWave.start();
+      return;
+    }
+
+    const wave = new SiriWave(waveCanvas);
+    wave.setSpeed(0.01);
+    wave.start();
+    runtimeWindow.__siriWave = wave;
   }
 
-  set(noise: number, speed: number) {
-    this.setNoise(noise)
-    this.setSpeed(speed)
+  function getBannerBackgroundUrl(): string {
+    const isDark = document.documentElement.getAttribute("theme") === "dark";
+    const body = document.body;
+    const coverUrl = body?.getAttribute("data-cover-url") || "";
+
+    if (coverUrl) {
+      return coverUrl;
+    }
+
+    if (isDark) {
+      return "/src/assets/theme/banner/banner_dark.webp";
+    }
+    return "/src/assets/theme/banner/banner.webp";
   }
 
-  resize() {
-    this.devicePixelRatio = window.devicePixelRatio || 1
-    this.width = this.devicePixelRatio * window.innerWidth
-    this.height = this.devicePixelRatio * 100
-    this.MAX = this.height / 2
-    this.canvas.width = this.width
-    this.canvas.height = this.height
-    this.canvas.style.width = this.width / this.devicePixelRatio + 'px'
-    this.canvas.style.height = this.height / this.devicePixelRatio + 'px'
+  function preloadImage(url: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => resolve();
+      img.src = url;
+    });
   }
 
-  attachCanvas(canvas: HTMLCanvasElement) {
-    this.canvas = canvas
-    this.ctx = this.canvas.getContext('2d')!
-    this.resize()
-  }
-}
+  async function updateBannerBackground(newUrl: string) {
+    const currentLayer = document.getElementById(
+      "bg-layer-current",
+    ) as HTMLElement;
+    const nextLayer = document.getElementById("bg-layer-next") as HTMLElement;
 
-type BannerWindow = Window & {
-  __bannerIntroPlayed?: boolean
-  __siriWave?: SiriWave
-  __siriWaveResizeBound?: boolean
-}
+    if (!currentLayer || !nextLayer || runtimeWindow.__isBgTransitioning)
+      return;
 
-const runtimeWindow = window as BannerWindow
+    const currentUrl = runtimeWindow.__currentBgUrl || getBannerBackgroundUrl();
 
-function applyIntroAnimation() {
-  const bannerEl = document.querySelector('.banner') as HTMLElement | null
-  if (!bannerEl) return
+    if (currentUrl === newUrl) return;
 
-  if (!runtimeWindow.__bannerIntroPlayed) {
-    bannerEl.classList.add('loadingComplete')
-    runtimeWindow.__bannerIntroPlayed = true
-  } else {
-    bannerEl.classList.remove('loadingComplete')
-  }
-}
+    runtimeWindow.__isBgTransitioning = true;
 
-function initWave() {
-  const waveCanvas = document.getElementById('wave') as HTMLCanvasElement | null
-  if (!waveCanvas) return
+    await preloadImage(newUrl);
 
-  if (runtimeWindow.__siriWave) {
-    runtimeWindow.__siriWave.attachCanvas(waveCanvas)
-    runtimeWindow.__siriWave.start()
-    return
+    nextLayer.style.backgroundImage = `url(${newUrl})`;
+    nextLayer.classList.add("transitioning-in");
+
+    setTimeout(() => {
+      currentLayer.style.backgroundImage = `url(${newUrl})`;
+      runtimeWindow.__currentBgUrl = newUrl;
+      runtimeWindow.__isBgTransitioning = false;
+
+      nextLayer.classList.remove("transitioning-in");
+    }, 500);
   }
 
-  const wave = new SiriWave(waveCanvas)
-  wave.setSpeed(0.01)
-  wave.start()
-  runtimeWindow.__siriWave = wave
-}
+  async function checkAndUpdateBackground() {
+    const newUrl = getBannerBackgroundUrl();
 
-function debounce(func: () => void, wait: number) {
-  let timeout: number | undefined
-  return function () {
-    clearTimeout(timeout)
-    timeout = window.setTimeout(() => {
-      func()
-    }, wait)
+    if (!runtimeWindow.__currentBgUrl) {
+      const currentLayer = document.getElementById(
+        "bg-layer-current",
+      ) as HTMLElement;
+      if (currentLayer) {
+        await preloadImage(newUrl);
+        currentLayer.style.backgroundImage = `url(${newUrl})`;
+        runtimeWindow.__currentBgUrl = newUrl;
+      }
+    } else {
+      await updateBannerBackground(newUrl);
+    }
   }
-}
 
-document.addEventListener('astro:page-load', () => {
-  applyIntroAnimation()
-  initWave()
-})
+  function setupThemeObserver() {
+    const observer = new MutationObserver(() => {
+      checkAndUpdateBackground();
+    });
 
-if (!runtimeWindow.__siriWaveResizeBound) {
-  window.addEventListener(
-    'resize',
-    debounce(() => {
-      runtimeWindow.__siriWave?.resize()
-    }, 100),
-  )
-  runtimeWindow.__siriWaveResizeBound = true
-}
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["theme"],
+    });
 
-applyIntroAnimation()
-initWave()
+    return observer;
+  }
+
+  function debounce(func: () => void, wait: number) {
+    let timeout: number | undefined;
+    return function () {
+      clearTimeout(timeout);
+      timeout = window.setTimeout(() => {
+        func();
+      }, wait);
+    };
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    applyIntroAnimation();
+    initWave();
+    checkAndUpdateBackground();
+    setupThemeObserver();
+  });
+
+  document.addEventListener("astro:after-preparation", () => {
+    checkAndUpdateBackground();
+  });
+
+  if (!runtimeWindow.__siriWaveResizeBound) {
+    window.addEventListener(
+      "resize",
+      debounce(() => {
+        runtimeWindow.__siriWave?.resize();
+      }, 100),
+    );
+    runtimeWindow.__siriWaveResizeBound = true;
+  }
+
+  applyIntroAnimation();
+  initWave();
+  checkAndUpdateBackground().catch((err) => {
+    console.error("Failed to initialize banner background:", err);
+    const currentLayer = document.getElementById(
+      "bg-layer-current",
+    ) as HTMLElement;
+    if (currentLayer) {
+      const defaultUrl = getBannerBackgroundUrl();
+      currentLayer.style.backgroundImage = `url(${defaultUrl})`;
+      runtimeWindow.__currentBgUrl = defaultUrl;
+    }
+  });
 </script>
 
 <style lang="less">
-.banner {
-  transform: translateZ(0);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 75vh;
-  z-index: 1;
-  mask: linear-gradient(to top, transparent, var(--general-background-color) 5%);
-  perspective: 1000px;
-  overflow: hidden;
-  -webkit-user-drag: none;
-  transition: height 0.3s;
+  .banner {
+    transform: translateZ(0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 75vh;
+    z-index: 1;
+    mask: linear-gradient(
+      to top,
+      transparent,
+      var(--general-background-color) 5%
+    );
+    perspective: 1000px;
+    overflow: hidden;
+    -webkit-user-drag: none;
+    transition: height 0.3s;
 
-  &.loadingComplete {
-    animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-  }
-}
-
-@keyframes fade-blur-in {
-  from {
-    filter: var(--blur-val);
-    transform: scale(1.5);
+    &.loadingComplete {
+      animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    }
   }
 
-  to {
-    filter: none;
-    transform: scale(1);
+  @keyframes fade-blur-in {
+    from {
+      filter: var(--blur-val);
+      transform: scale(1.5);
+    }
+
+    to {
+      filter: none;
+      transform: scale(1);
+    }
   }
-}
 
-.postViewer {
-  height: 50vh;
-}
-
-.banner-content {
-  position: relative;
-  z-index: 80;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-}
-
-.bg-img {
-  background-image: url(../assets/theme/banner/banner.webp);
-  html[theme='dark'] & {
-    background-image: url(../assets/theme/banner/banner_dark.webp), url(../assets/theme/banner/banner.webp);
+  .postViewer {
+    height: 50vh;
   }
-  position: absolute;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center center;
-  filter: var(--img-brightness); 
-  transition: filter 0.5s, background-image 0.5s;
-  z-index: -1;
-}
 
-.custom-cover {
-  /* 对于自定义的文章封面，去除暗黑模式下自带的双层背景 */
-  background-image: none !important; 
-}
+  .banner-content {
+    position: relative;
+    z-index: 80;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+  }
 
-#wave {
-  position: absolute;
-  bottom: 0;
-  z-index: 50;
-}
+  .bg-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    filter: var(--img-brightness);
+    transition:
+      opacity 0.5s ease-in-out,
+      filter 0.5s;
+    z-index: -1;
+  }
+
+  #bg-layer-current {
+    opacity: 1;
+  }
+
+  #bg-layer-next {
+    opacity: 0;
+  }
+
+  .transitioning-in {
+    opacity: 1 !important;
+  }
+
+  #wave {
+    position: absolute;
+    bottom: 0;
+    z-index: 50;
+  }
 </style>

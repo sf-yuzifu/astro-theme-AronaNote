@@ -16,6 +16,8 @@ interface Props {
 }
 
 const { title, description, isPost = false, coverImage } = Astro.props;
+
+const coverUrl = coverImage ? (typeof coverImage === 'string' ? coverImage : coverImage.src) : '';
 ---
 
 <!doctype html>
@@ -23,7 +25,7 @@ const { title, description, isPost = false, coverImage } = Astro.props;
   <head>
     <BaseHead title={title} description={description} />
   </head>
-  <body>
+  <body data-cover-url={coverUrl}>
     <!-- <Splash /> -->
     
     <!-- Banner区域 - 保持持久化 -->

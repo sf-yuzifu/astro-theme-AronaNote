@@ -8,6 +8,7 @@ import Banner from "../components/Banner.astro";
 import Splash from "../components/Splash.astro";
 import BackToTop from "../components/BackToTop.astro";
 import Cursor from "../components/Cursor.astro";
+import SearchDialog from "../components/SearchDialog.astro";
 import "../styles/index.less";
 
 interface Props {
@@ -91,6 +92,9 @@ const coverUrl = coverImage
 
     <!-- 点击特效 - 保持持久化 -->
     <Cursor transition:persist="click-canvas" />
+
+    <!-- 搜索对话框 -->
+    <SearchDialog />
   </body>
 </html>
 

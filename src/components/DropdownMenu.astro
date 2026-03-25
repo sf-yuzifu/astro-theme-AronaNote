@@ -1,9 +1,13 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
+import SearchButton from "./SearchButton.astro";
 ---
 
 <div class="dropdown-menu" id="dropdown-menu">
   <div class="menu-content">
+    <div class="first-row">
+      <SearchButton />
+    </div>
     <ThemeToggle />
   </div>
 </div>
@@ -119,6 +123,17 @@ import ThemeToggle from "./ThemeToggle.astro";
       display: flex;
       flex-direction: column;
       align-items: center;
+
+      .first-row {
+        display: flex;
+        gap: 0.4vw;
+        padding: 0.3vw;
+        padding-bottom: 1vh;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        border-bottom: 1px dashed var(--font-color-grey);
+      }
     }
   }
 

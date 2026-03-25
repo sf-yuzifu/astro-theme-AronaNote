@@ -24,3 +24,27 @@ export const FRIENDS: Friend[] = [
     description: "An example blog for demonstration",
   },
 ];
+
+// 项目数据
+export interface Project {
+  name: string;
+  url: string;
+  description: string;
+  tags?: string[];
+  image?: string;
+}
+
+export const PROJECTS: Project[] = [
+  {
+    name: "Astro Blog",
+    url: "https://github.com/withastro/astro",
+    description: "使用 Astro 构建的个人博客网站，支持 Markdown 和 MDX",
+    tags: ["Astro", "TypeScript", "Less"],
+  },
+  {
+    name: "Example Project",
+    url: "https://example.com",
+    description: "一个示例项目用于演示",
+    tags: ["React", "Node.js"],
+  },
+];

@@ -1,0 +1,283 @@
+---
+import { Icon } from "astro-icon/components";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE_TITLE, SITE_DESCRIPTION, PROJECTS } from "../consts";
+---
+
+<BaseLayout
+  title={`Projects | ${SITE_TITLE}`}
+  description={SITE_DESCRIPTION}
+  isPost={true}
+>
+  <!-- Banner内容 -->
+  <div slot="banner-content" class="projects-banner">
+    <h1 class="title">我的项目</h1>
+    <span class="status">开源作品与个人项目展示</span>
+  </div>
+
+  <!-- 项目列表 -->
+  <div class="projects-container">
+    <ul class="projects-list">
+      {
+        PROJECTS.map((project) => (
+          <li class="project-card">
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <div class="project-icon">
+                <Icon name="ph:folder-open-bold" class="folder-icon" />
+              </div>
+              <div class="project-info">
+                <h3>{project.name}</h3>
+                <p>{project.description}</p>
+                {project.tags && (
+                  <div class="project-tags">
+                    {project.tags.map((tag) => (
+                      <span class="tag">{tag}</span>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <Icon name="ph:arrow-right-bold" class="arrow-icon" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</BaseLayout>
+
+<style lang="less">
+  .projects-banner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--post-InnerBanner-color);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    transition: color 0.5s;
+
+    .title {
+      font-size: 4.5vw;
+      margin-bottom: 50px;
+      text-align: center;
+      margin-top: 0;
+      color: var(--post-InnerBanner-color);
+      transition: color 0.5s;
+    }
+
+    .status {
+      font-size: 1vw;
+      font-weight: bold;
+      color: var(--post-InnerBanner-color);
+      transition: color 0.5s;
+    }
+
+    @media (max-width: 768px) {
+      .title {
+        font-size: 5vh;
+        margin-bottom: 30px;
+      }
+      .status {
+        font-size: 1.5vh;
+      }
+    }
+  }
+
+  .projects-container {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1200px;
+    position: relative;
+    padding: 36px;
+    border-radius: 32px;
+    border: solid 2px var(--foreground-color);
+    background: var(--foreground-color);
+    box-shadow: 0px 0px 8px rgb(var(--blue-shadow-color), 0.8);
+    transition:
+      opacity 0.5s ease-out,
+      transform 1s cubic-bezier(0.61, 0.15, 0.26, 1),
+      border 0.5s,
+      background 0.5s,
+      box-shadow 0.5s;
+    background-image:
+      linear-gradient(90deg, rgba(159, 219, 252, 0.15) 3%, transparent 0),
+      linear-gradient(1turn, rgba(159, 219, 252, 0.15) 3%, transparent 0);
+    background-size: 20px 20px;
+    background-position: 50%;
+
+    html[theme="dark"] & {
+      background-image:
+        linear-gradient(90deg, rgba(207, 198, 254, 0.08) 3%, transparent 0),
+        linear-gradient(1turn, rgba(207, 198, 254, 0.08) 3%, transparent 0);
+    }
+  }
+
+  .projects-list {
+    width: 100%;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 20px;
+
+    .project-card {
+      width: 100%;
+      min-width: 0;
+      background-color: var(--foreground-color);
+      border-radius: 16px;
+      border: solid 2px var(--foreground-color);
+      transition: all 0.3s ease;
+      box-shadow: 0px 0px 8px rgb(var(--blue-shadow-color), 0.3);
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 0px 15px rgb(var(--blue-shadow-color), 0.5);
+        border-color: var(--font-color-gold);
+      }
+
+      a {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 24px;
+        text-decoration: none;
+        color: inherit;
+        min-width: 0;
+      }
+
+      .project-icon {
+        flex-shrink: 0;
+        width: 64px;
+        height: 64px;
+        border-radius: 12px;
+        background-color: var(--btn-background);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        .folder-icon {
+          width: 32px;
+          height: 32px;
+          color: var(--font-color-gold);
+        }
+      }
+
+      .project-info {
+        flex: 1;
+        min-width: 0;
+
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 20px;
+          color: var(--font-color-grey);
+          display: -webkit-box;
+          word-break: break-word;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        p {
+          margin: 0 0 12px 0;
+          font-size: 14px;
+          color: var(--font-color-grey);
+          opacity: 0.7;
+          display: -webkit-box;
+          word-break: break-word;
+          text-overflow: ellipsis;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+
+        .project-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+
+          .tag {
+            font-size: 12px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            background-color: var(--btn-background);
+            color: var(--font-color-gold);
+            border: 1px solid var(--font-color-gold);
+          }
+        }
+      }
+
+      .arrow-icon {
+        flex-shrink: 0;
+        width: 24px;
+        height: 24px;
+        color: var(--font-color-grey);
+        opacity: 0.5;
+        transition: all 0.3s ease;
+      }
+
+      &:hover .arrow-icon {
+        opacity: 1;
+        color: var(--font-color-gold);
+        transform: translateX(4px);
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .projects-container {
+      padding: 24px 16px;
+      margin: 0 12px;
+    }
+
+    .projects-list {
+      .project-card {
+        a {
+          padding: 16px;
+          gap: 12px;
+        }
+
+        .project-icon {
+          width: 48px;
+          height: 48px;
+
+          .folder-icon {
+            width: 24px;
+            height: 24px;
+          }
+        }
+
+        .project-info {
+          h3 {
+            font-size: 16px;
+            margin-bottom: 6px;
+          }
+
+          p {
+            font-size: 13px;
+            margin-bottom: 8px;
+          }
+
+          .project-tags {
+            gap: 6px;
+
+            .tag {
+              font-size: 11px;
+              padding: 3px 8px;
+            }
+          }
+        }
+
+        .arrow-icon {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+</style>

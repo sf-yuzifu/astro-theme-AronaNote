@@ -7,6 +7,7 @@ import Header from "../components/Header.astro";
 import Banner from "../components/Banner.astro";
 import Splash from "../components/Splash.astro";
 import BackToTop from "../components/BackToTop.astro";
+import Cursor from "../components/Cursor.astro";
 import "../styles/index.less";
 
 interface Props {
@@ -87,6 +88,9 @@ const coverUrl = coverImage
 
     <!-- 回到顶部按钮 - 保持持久化 -->
     <BackToTop transition:persist="totop" />
+
+    <!-- 点击特效 - 保持持久化 -->
+    <Cursor transition:persist="click-canvas" />
   </body>
 </html>
 

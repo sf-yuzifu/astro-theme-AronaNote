@@ -5,9 +5,16 @@
 
 <script>
   import PhotoSwipeLightbox from "photoswipe/lightbox";
-  import "photoswipe/style.css";
+
+  let lightboxInstance: any = null;
 
   function initPhotoSwipe() {
+    // 清理旧的实例
+    if (lightboxInstance) {
+      lightboxInstance.destroy();
+      lightboxInstance = null;
+    }
+
     // 获取文章容器中的所有图片
     const content = document.querySelector(".content");
     if (!content) return;
@@ -16,7 +23,7 @@
     if (images.length === 0) return;
 
     // 为每个图片创建画廊数据
-    const galleryItems = Array.from(images).map((img, index) => {
+    const galleryItems = Array.from(images).map((img) => {
       // 确保图片有 data-pswp-width 和 data-pswp-height
       if (!img.dataset.pswpWidth || !img.dataset.pswpHeight) {
         // 如果图片已加载，使用实际尺寸
@@ -50,7 +57,7 @@
     }
 
     // 初始化 PhotoSwipe
-    const lightbox = new PhotoSwipeLightbox({
+    lightboxInstance = new PhotoSwipeLightbox({
       dataSource: validItems,
       pswpModule: () => import("photoswipe"),
       bgOpacity: 0.9,
@@ -66,11 +73,11 @@
     validItems.forEach((item, index) => {
       item.element?.addEventListener("click", (e) => {
         e.preventDefault();
-        lightbox.loadAndOpen(index);
+        lightboxInstance?.loadAndOpen(index);
       });
     });
 
-    lightbox.init();
+    lightboxInstance.init();
   }
 
   // 页面加载完成后初始化
@@ -82,18 +89,34 @@
 
   // Astro 页面切换后重新初始化
   document.addEventListener("astro:page-load", initPhotoSwipe);
+
+  // 清理旧实例
+  document.addEventListener("astro:before-swap", () => {
+    if (lightboxInstance) {
+      lightboxInstance.destroy();
+      lightboxInstance = null;
+    }
+  });
 </script>
 
 <style is:global>
-  /* PhotoSwipe 自定义样式 */
+  /* PhotoSwipe 自定义样式 - 内联以确保路由切换时可用 */
   .pswp {
     --pswp-bg: rgba(0, 0, 0, 0.9);
     --pswp-placeholder-bg: rgba(0, 0, 0, 0.3);
+    --pswp-root-z-index: 2147483647;
+  }
+
+  /* 确保 PhotoSwipe 容器在最上层 */
+  .pswp {
+    position: fixed !important;
+    z-index: 2147483647 !important;
   }
 
   /* 图片悬停效果 */
   .content img {
     transition: opacity 0.2s ease;
+    cursor: zoom-in;
   }
 
   .content img:hover {

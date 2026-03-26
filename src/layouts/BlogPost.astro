@@ -4,6 +4,7 @@ import BaseLayout from "./BaseLayout.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import WalineComment from "../components/WalineComment.astro";
 import PostFooter from "../components/PostFooter.astro";
+import PhotoSwipe from "../components/PhotoSwipe.astro";
 
 type Props = CollectionEntry<"blog">["data"] & {
   minutesRead?: string;
@@ -80,6 +81,9 @@ const {
 
   <!-- 评论区 -->
   <WalineComment />
+
+  <!-- 图片灯箱 -->
+  <PhotoSwipe />
 </BaseLayout>
 
 <style lang="less" is:global>

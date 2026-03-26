@@ -1,0 +1,102 @@
+---
+// PhotoSwipe 图片灯箱组件
+// 自动为文章中的图片添加点击放大功能
+---
+
+<script>
+  import PhotoSwipeLightbox from "photoswipe/lightbox";
+  import "photoswipe/style.css";
+
+  function initPhotoSwipe() {
+    // 获取文章容器中的所有图片
+    const content = document.querySelector(".content");
+    if (!content) return;
+
+    const images = content.querySelectorAll("img");
+    if (images.length === 0) return;
+
+    // 为每个图片创建画廊数据
+    const galleryItems = Array.from(images).map((img, index) => {
+      // 确保图片有 data-pswp-width 和 data-pswp-height
+      if (!img.dataset.pswpWidth || !img.dataset.pswpHeight) {
+        // 如果图片已加载，使用实际尺寸
+        if (img.complete && img.naturalWidth) {
+          img.dataset.pswpWidth = String(img.naturalWidth);
+          img.dataset.pswpHeight = String(img.naturalHeight);
+        }
+      }
+
+      // 添加点击样式
+      img.style.cursor = "zoom-in";
+
+      return {
+        src: img.src,
+        width: parseInt(img.dataset.pswpWidth || "0"),
+        height: parseInt(img.dataset.pswpHeight || "0"),
+        alt: img.alt || "",
+        element: img,
+      };
+    });
+
+    // 过滤掉没有尺寸信息的图片
+    const validItems = galleryItems.filter(
+      (item) => item.width > 0 && item.height > 0,
+    );
+
+    if (validItems.length === 0) {
+      // 如果图片还没有加载完成，等待加载后再初始化
+      setTimeout(initPhotoSwipe, 500);
+      return;
+    }
+
+    // 初始化 PhotoSwipe
+    const lightbox = new PhotoSwipeLightbox({
+      dataSource: validItems,
+      pswpModule: () => import("photoswipe"),
+      bgOpacity: 0.9,
+      showHideAnimationType: "zoom",
+      imageClickAction: "zoom",
+      tapAction: "zoom",
+      doubleTapAction: "zoom",
+      wheelToZoom: true,
+      padding: { top: 20, bottom: 20, left: 20, right: 20 },
+    });
+
+    // 点击图片时打开灯箱
+    validItems.forEach((item, index) => {
+      item.element?.addEventListener("click", (e) => {
+        e.preventDefault();
+        lightbox.loadAndOpen(index);
+      });
+    });
+
+    lightbox.init();
+  }
+
+  // 页面加载完成后初始化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPhotoSwipe);
+  } else {
+    initPhotoSwipe();
+  }
+
+  // Astro 页面切换后重新初始化
+  document.addEventListener("astro:page-load", initPhotoSwipe);
+</script>
+
+<style is:global>
+  /* PhotoSwipe 自定义样式 */
+  .pswp {
+    --pswp-bg: rgba(0, 0, 0, 0.9);
+    --pswp-placeholder-bg: rgba(0, 0, 0, 0.3);
+  }
+
+  /* 图片悬停效果 */
+  .content img {
+    transition: opacity 0.2s ease;
+  }
+
+  .content img:hover {
+    opacity: 0.9;
+  }
+</style>

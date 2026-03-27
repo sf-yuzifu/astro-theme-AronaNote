@@ -39,13 +39,13 @@ nav:
   - name: "首页"
     url: "/"
   - name: "标签"
-    url: "/tags"
+    url: "/tags/"
   - name: "项目"
-    url: "/project"
+    url: "/project/"
   - name: "友链"
-    url: "/friends"
+    url: "/friends/"
   - name: "关于"
-    url: "/about"
+    url: "/about/"
 
 # 友链配置
 friends:

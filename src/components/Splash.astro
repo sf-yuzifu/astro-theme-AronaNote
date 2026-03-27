@@ -2,58 +2,88 @@
 // 页面加载动画组件 - 参考vitepress-theme-bluearchive的Splash.vue
 ---
 
-<div id="splash-container" class="splash-container">
-  <svg viewBox="0 0 1728 1117" preserveAspectRatio="xMinYMin slice" fill="none" xmlns="http://www.w3.org/2000/svg">
+<div id="splash-container" class="splash-container" transition:persist>
+  <svg
+    viewBox="0 0 1728 1117"
+    preserveAspectRatio="xMinYMin slice"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <g clip-path="url(#clip0_2_5)">
       <g class="triangle-group">
-        <path d="M606 -123L1061 666H151L606 -123Z"/>
-        <path d="M190.15 144L67.3 -68.94L313 -68.94L190.15 144Z"/>
-        <path d="M1424.17 339L1249.35 35.97L1599 35.97L1424.17 339Z"/>
-        <path d="M-96.7 513.333L-216.4 305.853H23L-96.7 513.333Z"/>
-        <path d="M502.825 603.83L391 410L614.65 410L502.825 603.83Z"/>
-        <path d="M1228.45 648.333L1048.9 337.113L1408 337.113L1228.45 648.333Z"/>
-        <path d="M246.375 925.667L96.75 666.317H396L246.375 925.667Z"/>
-        <path d="M606.375 1048.45L504 871L708.75 871L606.375 1048.45Z"/>
-        <path d="M1376.5 960L1219 687H1534L1376.5 960Z"/>
-        <path d="M365.395 170L503.791 409.885H227L365.395 170Z"/>
-        <path d="M1049.36 337L1198.71 595.886H900L1049.36 337Z"/>
-        <path d="M1248.81 36L1340.61 195.132H1157L1248.81 36Z"/>
-        <path d="M503.99 680.333L614.981 872.716H393L503.99 680.333Z"/>
-        <path d="M870.433 698.333L997.866 919.218H743L870.433 698.333Z"/>
-        <path d="M1419.1 487L1534.2 686.508H1304L1419.1 487Z"/>
-        <path d="M312.914 809L445.828 1039.38H180L312.914 809Z"/>
-        <path d="M1225.51 1053.67L1368.01 1300.68H1083L1225.51 1053.67Z"/>
-        <path d="M1550.51 792L1693.01 1039.01H1408L1550.51 792Z"/>
+        <path d="M606 -123L1061 666H151L606 -123Z"></path>
+        <path d="M190.15 144L67.3 -68.94L313 -68.94L190.15 144Z"></path>
+        <path d="M1424.17 339L1249.35 35.97L1599 35.97L1424.17 339Z"></path>
+        <path d="M-96.7 513.333L-216.4 305.853H23L-96.7 513.333Z"></path>
+        <path d="M502.825 603.83L391 410L614.65 410L502.825 603.83Z"></path>
+        <path d="M1228.45 648.333L1048.9 337.113L1408 337.113L1228.45 648.333Z"
+        ></path>
+        <path d="M246.375 925.667L96.75 666.317H396L246.375 925.667Z"></path>
+        <path d="M606.375 1048.45L504 871L708.75 871L606.375 1048.45Z"></path>
+        <path d="M1376.5 960L1219 687H1534L1376.5 960Z"></path>
+        <path d="M365.395 170L503.791 409.885H227L365.395 170Z"></path>
+        <path d="M1049.36 337L1198.71 595.886H900L1049.36 337Z"></path>
+        <path d="M1248.81 36L1340.61 195.132H1157L1248.81 36Z"></path>
+        <path d="M503.99 680.333L614.981 872.716H393L503.99 680.333Z"></path>
+        <path d="M870.433 698.333L997.866 919.218H743L870.433 698.333Z"></path>
+        <path d="M1419.1 487L1534.2 686.508H1304L1419.1 487Z"></path>
+        <path d="M312.914 809L445.828 1039.38H180L312.914 809Z"></path>
+        <path d="M1225.51 1053.67L1368.01 1300.68H1083L1225.51 1053.67Z"></path>
+        <path d="M1550.51 792L1693.01 1039.01H1408L1550.51 792Z"></path>
       </g>
       <g id="breathing-parts">
-        <path class="circle-path" fill-rule="evenodd" clip-rule="evenodd" d="M864 769C979.98 769 1074 674.98 1074 559C1074 443.02 979.98 349 864 349C748.02 349 654 443.02 654 559C654 674.98 748.02 769 864 769ZM864 749.909C969.436 749.909 1054.91 664.436 1054.91 559C1054.91 453.564 969.436 368.091 864 368.091C758.564 368.091 673.091 453.564 673.091 559C673.091 664.436 758.564 749.909 864 749.909Z"/>
-        <path class="led-path" d="M934.636 392.273H792.727L757.091 447H970.909L934.636 392.273Z"/>
-        <path class="led-path" d="M969.636 450.182H897.727L934.636 504.273L969.636 450.182Z"/>
-        <path class="led-path" d="M792.091 500.455L828.364 447L900.909 555.182L863.364 609.273L792.091 500.455Z"/>
-        <path class="led-path" d="M900.909 667.182L865.909 612.455L903.5 558.364L973.455 667.182L937.818 721.909H796.545L760.273 667.182L796.545 612.455L832.818 667.182H900.909Z"/>
+        <path
+          class="circle-path"
+          fill-rule="evenodd"
+          clip-rule="evenodd"
+          d="M864 769C979.98 769 1074 674.98 1074 559C1074 443.02 979.98 349 864 349C748.02 349 654 443.02 654 559C654 674.98 748.02 769 864 769ZM864 749.909C969.436 749.909 1054.91 664.436 1054.91 559C1054.91 453.564 969.436 368.091 864 368.091C758.564 368.091 673.091 453.564 673.091 559C673.091 664.436 758.564 749.909 864 749.909Z"
+        ></path>
+        <path
+          class="led-path"
+          d="M934.636 392.273H792.727L757.091 447H970.909L934.636 392.273Z"
+        ></path>
+        <path
+          class="led-path"
+          d="M969.636 450.182H897.727L934.636 504.273L969.636 450.182Z"></path>
+        <path
+          class="led-path"
+          d="M792.091 500.455L828.364 447L900.909 555.182L863.364 609.273L792.091 500.455Z"
+        ></path>
+        <path
+          class="led-path"
+          d="M900.909 667.182L865.909 612.455L903.5 558.364L973.455 667.182L937.818 721.909H796.545L760.273 667.182L796.545 612.455L832.818 667.182H900.909Z"
+        ></path>
       </g>
     </g>
     <defs>
       <filter id="glow">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
-        <feFlood class="glow-color" flood-opacity="2.5"/>
-        <feComposite in2="blur" operator="in"/>
-        <feComposite in="SourceGraphic"/>
+        <feGaussianBlur stdDeviation="4" result="blur"></feGaussianBlur>
+        <feFlood class="glow-color" flood-opacity="2.5"></feFlood>
+        <feComposite in2="blur" operator="in"></feComposite>
+        <feComposite in="SourceGraphic"></feComposite>
       </filter>
     </defs>
   </svg>
 </div>
 
 <script is:inline>
-  (function() {
+  (function () {
+    // 检查是否已经显示过 Splash（首次加载）
+    if (window.__splashShown) {
+      return;
+    }
+
+    // 标记已显示
+    window.__splashShown = true;
+
     // 呼吸动画
     function createBreathingAnimation() {
-      const breathingParts = document.getElementById('breathing-parts');
+      const breathingParts = document.getElementById("breathing-parts");
       if (!breathingParts) return;
-      
+
       let opacity = 0.3;
       let direction = 1;
-      
+
       function animate() {
         opacity += 0.01 * direction;
         if (opacity >= 1) direction = -1;
@@ -61,21 +91,26 @@
         breathingParts.style.opacity = opacity;
         requestAnimationFrame(animate);
       }
-      
+
       animate();
     }
 
     // 淡出并隐藏Splash
     function fadeOutSplash() {
-      const splash = document.getElementById('splash-container');
+      const splash = document.getElementById("splash-container");
       if (!splash) return;
-      
-      splash.style.opacity = '0';
-      splash.style.transition = 'opacity 500ms ease-in-out';
-      
+
+      splash.style.opacity = "0";
+      splash.style.transition = "opacity 500ms ease-in-out";
+
       setTimeout(() => {
-        splash.style.display = 'none';
-        document.body.classList.remove('splash-loading');
+        splash.style.display = "none";
+        // 移除 html 和 body 的类
+        document.documentElement.classList.remove("splash-loading");
+        document.body.classList.remove("splash-loading");
+        // 恢复滚动条
+        document.documentElement.style.overflow = "";
+        document.body.style.overflow = "";
       }, 500);
     }
 
@@ -86,26 +121,38 @@
 
     // 初始化
     function init() {
-      document.body.classList.add('splash-loading');
-      
+      const splash = document.getElementById("splash-container");
+      if (!splash) return;
+
+      // 如果已经隐藏（通过 CSS），不再处理
+      if (splash.style.display === "none") return;
+
+      // 给 html 和 body 都添加类
+      document.documentElement.classList.add("splash-loading");
+      document.body.classList.add("splash-loading");
+
+      // 立即隐藏滚动条（内联样式，确保在 CSS 加载前生效）
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+
       // 禁用滚轮
-      window.addEventListener('wheel', preventScroll, { passive: false });
-      window.addEventListener('touchmove', preventScroll, { passive: false });
-      
+      window.addEventListener("wheel", preventScroll, { passive: false });
+      window.addEventListener("touchmove", preventScroll, { passive: false });
+
       createBreathingAnimation();
-      
+
       // 随机等待1.2-1.5秒后淡出
       const delay = Math.floor(Math.random() * 300) + 1200;
       setTimeout(() => {
         fadeOutSplash();
-        window.removeEventListener('wheel', preventScroll);
-        window.removeEventListener('touchmove', preventScroll);
+        window.removeEventListener("wheel", preventScroll);
+        window.removeEventListener("touchmove", preventScroll);
       }, delay);
     }
 
     // 页面加载完成后初始化
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', init);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", init);
     } else {
       init();
     }
@@ -113,10 +160,23 @@
 </script>
 
 <style is:global>
-  /* Splash加载时禁止滚动 */
-  body.splash-loading {
-    overflow: hidden;
-    height: 100vh;
+  /* Splash加载时禁止滚动和隐藏整个页面滚动条 */
+  html.splash-loading {
+    overflow: hidden !important;
+  }
+
+  html.splash-loading body {
+    overflow: hidden !important;
+    height: 100vh !important;
+  }
+
+  html.splash-loading::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  html.splash-loading {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 
   .splash-container {
@@ -139,7 +199,7 @@
   }
 
   .splash-container .circle-path {
-    fill: #E0F0FA;
+    fill: #e0f0fa;
     fill-opacity: 0.9;
   }
 
@@ -152,15 +212,15 @@
     flood-color: white;
   }
 
-  html[theme='dark'] .splash-container {
+  html[theme="dark"] .splash-container {
     background: linear-gradient(#c3bde9, #fee4ff);
   }
 
-  html[theme='dark'] .splash-container .circle-path {
+  html[theme="dark"] .splash-container .circle-path {
     fill: #fee4ff;
   }
 
-  html[theme='dark'] .splash-container .glow-color {
+  html[theme="dark"] .splash-container .glow-color {
     flood-color: #efe0fd;
   }
 </style>

@@ -39,10 +39,13 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
       if (!countEl) return;
 
       // 检查是否已有数据（Waline 可能已经填充）
+      // 只有阅读量大于0时才显示
       const checkAndShow = () => {
         const text = countEl.textContent?.trim();
-        if (text && text !== "0") {
-          wrapper.style.display = "inline-flex";
+        const count = parseInt(text || "0", 10);
+        // 阅读量大于0才显示
+        if (count > 0) {
+          (wrapper as HTMLElement).style.display = "inline-flex";
           return true;
         }
         return false;
@@ -53,9 +56,7 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
 
       // 监听内容变化
       const observer = new MutationObserver(() => {
-        if (checkAndShow()) {
-          observer.disconnect();
-        }
+        checkAndShow();
       });
 
       observer.observe(countEl, {
@@ -64,10 +65,9 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
         subtree: true,
       });
 
-      // 5秒后自动显示（即使没有数据）
+      // 5秒后停止监听，但保持隐藏（如果count还是0）
       setTimeout(() => {
         observer.disconnect();
-        wrapper.style.display = "inline-flex";
       }, 5000);
     });
   }

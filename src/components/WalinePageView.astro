@@ -18,9 +18,10 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
 
 {
   enable && serverURL && (
-    <span class="waline-pageview" data-path={path} data-server-url={serverURL}>
+    <span class="waline-pageview-wrapper" style="display: none;">
+      {" | "}
       <span class="waline-pageview-count" data-path={path}>
-        ?
+        0
       </span>{" "}
       次阅读
     </span>
@@ -28,27 +29,46 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
 }
 
 <script>
-  import { pageviewCount } from "@waline/client";
-
+  // Waline 会自动填充 .waline-pageview-count 元素
+  // 我们只需要监听变化并显示组件
   function initPageView() {
-    const containers = document.querySelectorAll(".waline-pageview");
+    const wrappers = document.querySelectorAll(".waline-pageview-wrapper");
 
-    containers.forEach((container) => {
-      const serverURL = container.dataset.serverUrl;
-      const path = container.dataset.path || window.location.pathname;
+    wrappers.forEach((wrapper) => {
+      const countEl = wrapper.querySelector(".waline-pageview-count");
+      if (!countEl) return;
 
-      if (!serverURL) return;
+      // 检查是否已有数据（Waline 可能已经填充）
+      const checkAndShow = () => {
+        const text = countEl.textContent?.trim();
+        if (text && text !== "0") {
+          wrapper.style.display = "inline-flex";
+          return true;
+        }
+        return false;
+      };
 
-      // 使用 Waline 的 pageviewCount API
-      pageviewCount({
-        serverURL: serverURL,
-        path: path,
-      }).then((count: number) => {
-        const countEl = container.querySelector(".waline-pageview-count");
-        if (countEl) {
-          countEl.textContent = String(count || 0);
+      // 立即检查
+      if (checkAndShow()) return;
+
+      // 监听内容变化
+      const observer = new MutationObserver(() => {
+        if (checkAndShow()) {
+          observer.disconnect();
         }
       });
+
+      observer.observe(countEl, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+
+      // 5秒后自动显示（即使没有数据）
+      setTimeout(() => {
+        observer.disconnect();
+        wrapper.style.display = "inline-flex";
+      }, 5000);
     });
   }
 
@@ -64,7 +84,7 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
 </script>
 
 <style>
-  .waline-pageview {
+  .waline-pageview-wrapper {
     display: inline-flex;
     align-items: center;
     gap: 4px;

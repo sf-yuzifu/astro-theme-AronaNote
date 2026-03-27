@@ -61,7 +61,6 @@ const enableWalinePageView = COMMENTS_ENABLE && COMMENTS_TYPE === "waline";
           ),
           FEATURE_READING_TIME && wordCount && <>约 {wordCount} 字</>,
           FEATURE_READING_TIME && minutesRead && <>{minutesRead}</>,
-          enableWalinePageView && <WalinePageView />,
         ]
           .filter(Boolean)
           .map((item, index, arr) => (
@@ -71,6 +70,7 @@ const enableWalinePageView = COMMENTS_ENABLE && COMMENTS_TYPE === "waline";
             </>
           ))
       }
+      {enableWalinePageView && <WalinePageView />}
     </span>
   </div>
 

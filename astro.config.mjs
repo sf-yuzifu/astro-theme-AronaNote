@@ -8,6 +8,8 @@ import astroExpressiveCode from "astro-expressive-code";
 import { definePlugin } from "@expressive-code/core";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import { remarkReadingTime } from "./src/utils/remarkReadingTime.mjs";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import icon from "astro-icon";
 import Font from "vite-plugin-font";
 import { configReloadIntegration } from "./src/integrations/configReload.ts";
@@ -24,7 +26,8 @@ export default defineConfig({
     defaultStrategy: "hover",
   },
   markdown: {
-    remarkPlugins: [remarkReadingTime],
+    remarkPlugins: [remarkReadingTime, remarkMath],
+    rehypePlugins: [rehypeKatex],
   },
   integrations: [
     astroExpressiveCode({

@@ -1,4 +1,7 @@
 ---
+import bannerLight from "../assets/theme/banner/banner.webp";
+import bannerDark from "../assets/theme/banner/banner_dark.webp";
+
 interface Props {
   coverImage?: { src: string } | string;
   isPost?: boolean;
@@ -7,7 +10,11 @@ interface Props {
 const { coverImage, isPost = false } = Astro.props;
 ---
 
-<div class:list={["banner", { postViewer: isPost }]}>
+<div
+  class:list={["banner", { postViewer: isPost }]}
+  data-banner-light={bannerLight.src}
+  data-banner-dark={bannerDark.src}
+>
   <div class="banner-content">
     <slot />
   </div>
@@ -203,15 +210,16 @@ const { coverImage, isPost = false } = Astro.props;
     const isDark = document.documentElement.getAttribute("theme") === "dark";
     const body = document.body;
     const coverUrl = body?.getAttribute("data-cover-url") || "";
+    const bannerEl = document.querySelector(".banner");
 
     if (coverUrl) {
       return coverUrl;
     }
 
     if (isDark) {
-      return "/src/assets/theme/banner/banner_dark.webp";
+      return bannerEl?.getAttribute("data-banner-dark") || "";
     }
-    return "/src/assets/theme/banner/banner.webp";
+    return bannerEl?.getAttribute("data-banner-light") || "";
   }
 
   function preloadImage(url: string): Promise<void> {

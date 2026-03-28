@@ -1,31 +1,43 @@
 ---
 // 回到顶部按钮组件
 // 参考 vitepress-theme-bluearchive 的 ToTop.vue 实现
+import toTopIcon from "../assets/theme/toTop.svg";
 ---
 
-<a href="#" class="totop" id="totop" aria-label="回到顶部" transition:persist="totop">
-  <img src="/src/assets/theme/toTop.svg" alt="" draggable="false" />
+<a
+  href="#"
+  class="totop"
+  id="totop"
+  aria-label="回到顶部"
+  transition:persist="totop"
+>
+  <img src={toTopIcon.src} alt="" draggable="false" />
 </a>
 
 <script is:inline>
-  (function() {
+  (function () {
     // 防止重复初始化
     if (window.__backToTopInitialized) return;
     window.__backToTopInitialized = true;
 
-    const HIDE_CLASS = 'totop--hidden';
-    const NO_SCROLL_CLASS = 'totop--no-scroll';
+    const HIDE_CLASS = "totop--hidden";
+    const NO_SCROLL_CLASS = "totop--no-scroll";
 
     // 获取按钮元素
     function getTotop() {
-      return document.getElementById('totop');
+      return document.getElementById("totop");
     }
 
     // 检查页面是否有滚动条
     function hasScroll() {
       const doc = document.documentElement;
       const body = document.body;
-      const scrollHeight = Math.max(doc.scrollHeight, doc.offsetHeight, body.scrollHeight, body.offsetHeight);
+      const scrollHeight = Math.max(
+        doc.scrollHeight,
+        doc.offsetHeight,
+        body.scrollHeight,
+        body.offsetHeight,
+      );
       const clientHeight = window.innerHeight;
       return scrollHeight > clientHeight + 5; // 5px 容差
     }
@@ -46,14 +58,14 @@
     function toTop(e) {
       e.preventDefault();
       e.stopPropagation();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     // 初始化按钮状态
     function initTotop() {
       const totop = getTotop();
       if (!totop) {
-        console.warn('BackToTop: totop element not found');
+        console.warn("BackToTop: totop element not found");
         return;
       }
 
@@ -77,15 +89,15 @@
       }
 
       // 添加点击事件
-      freshTotop.addEventListener('click', toTop);
+      freshTotop.addEventListener("click", toTop);
     }
 
     // 设置滚动监听
     function setupScrollListener() {
       // 移除旧的监听
-      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener("scroll", onScroll);
       // 添加新的监听
-      window.addEventListener('scroll', onScroll);
+      window.addEventListener("scroll", onScroll);
     }
 
     // 完整的初始化流程
@@ -98,18 +110,18 @@
     }
 
     // 初始页面加载
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', fullInit);
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", fullInit);
     } else {
       fullInit();
     }
 
     // Astro 视图过渡完成后重新初始化
-    document.addEventListener('astro:page-load', fullInit);
+    document.addEventListener("astro:page-load", fullInit);
 
     // 窗口大小改变时重新检查
     let resizeTimeout;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(initTotop, 250);
     });

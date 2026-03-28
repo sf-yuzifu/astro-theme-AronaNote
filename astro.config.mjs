@@ -32,7 +32,7 @@ export default defineConfig({
       useThemedScrollbars: false,
       defaultProps: {
         showLineNumbers: true,
-        frame: "auto",
+        frame: "code",
       },
       plugins: [
         pluginLineNumbers(),
@@ -52,7 +52,7 @@ export default defineConfig({
         frames: {
           frameBoxShadowCssValue: "0px 0px 5px #c1c1c1",
           editorActiveTabIndicatorBottomColor: "var(--font-color-gold)",
-          editorActiveTabIndicatorHeight: "3px",
+          editorActiveTabIndicatorHeight: "5px",
         },
       },
       themeCssSelector: (theme) => {

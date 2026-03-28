@@ -9,6 +9,7 @@ import { definePlugin } from "@expressive-code/core";
 import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
 import { remarkReadingTime } from "./src/utils/remarkReadingTime.mjs";
 import icon from "astro-icon";
+import Font from "vite-plugin-font";
 import { configReloadIntegration } from "./src/integrations/configReload.ts";
 import { loadConfig } from "./src/config/index.ts";
 
@@ -20,7 +21,7 @@ export default defineConfig({
   site: config.site.url,
   prefetch: {
     prefetchAll: true,
-    defaultStrategy: 'hover',
+    defaultStrategy: "hover",
   },
   markdown: {
     remarkPlugins: [remarkReadingTime],
@@ -71,5 +72,13 @@ export default defineConfig({
     optimizeDeps: {
       include: ["@waline/client", "photoswipe/lightbox", "photoswipe"],
     },
+    plugins: [
+      Font.vite({
+        // @ts-ignore
+        css: {
+          fontFamily: "Resource Han Rounded CN",
+        },
+      }),
+    ],
   },
 });

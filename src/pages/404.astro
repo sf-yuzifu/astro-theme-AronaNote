@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import notFoundImage from "../assets/theme/NotFound.webp";
 ---
 
 <BaseLayout
@@ -15,7 +16,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
   <div class="notfound-container">
     <div class="not-found">
-      <img src="/src/assets/theme/NotFound.webp" alt="404" />
+      <img src={notFoundImage.src} alt="404" />
       <span>页面不存在</span>
       <span class="band"><a href="/">回到主页</a></span>
     </div>

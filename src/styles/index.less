@@ -1,7 +1,23 @@
 @import url(./vars.less);
 @import url(./icons.less);
 
-// 基础 CSS 变量（来自原 global.css）
+// JetBrains Mono 字体
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../assets/font/JetBrainsMono-Regular.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "JetBrains Mono";
+  src: url("../assets/font/JetBrainsMono-Italic.woff2") format("woff2");
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
 :root {
   --accent: #2337ff;
   --accent-dark: #000d8a;
@@ -400,6 +416,15 @@ html[theme="dark"] .expressive-code figure.frame .copy button:hover {
 .expressive-code pre {
   background-color: transparent !important;
   margin: 0 !important;
+  font-family:
+    "JetBrains Mono", "Resource Han Rounded CN", "Fira Code", "Consolas",
+    monospace !important;
+}
+
+.expressive-code code {
+  font-family:
+    "JetBrains Mono", "Resource Han Rounded CN", "Fira Code", "Consolas",
+    monospace !important;
 }
 
 // 滚动条样式

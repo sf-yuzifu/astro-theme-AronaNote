@@ -257,6 +257,7 @@ const isMobileDevice = () => {
 };
 
 let isPlaying = false; // 添加播放状态标志
+let isDialogPlaying = false; // 对话播放状态标志，用于控制眨眼动画
 
 const showDialog = ref(false);
 const currentDialog = ref("");
@@ -286,6 +287,7 @@ const handlePlayerClick = debounce(async (event: MouseEvent | TouchEvent) => {
   // 检查是否正在播放
   if (!isPlaying) {
     isPlaying = true;
+    isDialogPlaying = true; // 标记对话播放中，暂停眨眼动画
     isEyeControlDisabled.value = true;
 
     // 点击时重置眼睛位置
@@ -320,6 +322,7 @@ const handlePlayerClick = debounce(async (event: MouseEvent | TouchEvent) => {
 
       // 音频播放结束后清理状态
       isPlaying = false;
+      isDialogPlaying = false; // 对话播放结束，恢复眨眼动画
       isEyeControlDisabled.value = false;
       if (spineInstance) {
         spineInstance.state.setEmptyAnimation(2, 0);
@@ -328,6 +331,7 @@ const handlePlayerClick = debounce(async (event: MouseEvent | TouchEvent) => {
     } catch (error) {
       console.error("音频播放失败:", error);
       isPlaying = false;
+      isDialogPlaying = false; // 对话播放结束，恢复眨眼动画
       isEyeControlDisabled.value = false;
       showDialog.value = false;
     }
@@ -601,6 +605,12 @@ const initializeSpinePlayer = async (assets: SpineAssets) => {
     resetBonesState.value = resetBones;
 
     function playBlinkAnimation() {
+      // 如果正在播放对话动画，跳过本次眨眼，稍后重试
+      if (isDialogPlaying) {
+        blinkInterval = setTimeout(playBlinkAnimation, 500); // 500ms后重试
+        return;
+      }
+
       const randomTime = Math.random() * 3 + 3; // 5-8秒的随机间隔
       const shouldDoubleBlink = Math.random() > 0.5; // 随机决定是否连续播放两次
 

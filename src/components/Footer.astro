@@ -1,6 +1,6 @@
 ---
 import { Image } from "astro:assets";
-import footLogo from "../assets/theme/icon/footLogo.svg";
+import footLogo from "../assets/theme/icon/footLogo.png";
 import { FOOTER_LINKS, SITE_TITLE, SITE_AUTHOR, SITE_ICP } from "../consts";
 import type { ICPRecord } from "../consts";
 
@@ -108,8 +108,9 @@ const icpList: ICPRecord[] = (() => {
   .footer-logo {
     display: flex;
     align-items: center;
+    height: 75%;
     img {
-      height: 36px;
+      height: 100%;
       width: auto;
       filter: drop-shadow(0 0 8px #328cfa);
     }

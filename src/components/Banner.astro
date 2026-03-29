@@ -180,12 +180,57 @@ const { coverImage, isPost = false } = Astro.props;
     const bannerEl = document.querySelector(".banner") as HTMLElement | null;
     if (!bannerEl) return;
 
-    if (!runtimeWindow.__bannerIntroPlayed) {
-      bannerEl.classList.add("loadingComplete");
-      runtimeWindow.__bannerIntroPlayed = true;
-    } else {
-      bannerEl.classList.remove("loadingComplete");
+    // 先移除动画类，确保可以重新触发
+    bannerEl.classList.remove("loadingComplete");
+
+    // 强制重绘
+    void bannerEl.offsetHeight;
+
+    // 添加动画类
+    bannerEl.classList.add("loadingComplete");
+  }
+
+  function waitForSplashAndAnimate() {
+    const splash = document.getElementById("splash-container");
+    if (!splash) {
+      // 没有splash，直接播放动画
+      applyIntroAnimation();
+      return;
     }
+
+    // 检查splash是否还在显示
+    if (splash.style.display === "none" || splash.style.opacity === "0") {
+      // splash已经消失，直接播放动画
+      applyIntroAnimation();
+      return;
+    }
+
+    // 等待splash消失后再播放动画
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes") {
+          const target = mutation.target as HTMLElement;
+          if (target.style.display === "none" || target.style.opacity === "0") {
+            observer.disconnect();
+            // 稍微延迟确保splash完全消失
+            setTimeout(() => {
+              applyIntroAnimation();
+            }, 100);
+            return;
+          }
+        }
+      }
+    });
+
+    observer.observe(splash, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+
+    // 保险：最多等2秒后强制播放
+    setTimeout(() => {
+      observer.disconnect();
+    }, 2000);
   }
 
   function initWave() {
@@ -329,12 +374,10 @@ const { coverImage, isPost = false } = Astro.props;
   }
 
   document.addEventListener("astro:page-load", () => {
-    // 只在路由切换时（非首次加载）移除入场动画类
-    if (runtimeWindow.__bannerInitialLoad) {
-      const bannerEl = document.querySelector(".banner") as HTMLElement | null;
-      if (bannerEl) {
-        bannerEl.classList.remove("loadingComplete");
-      }
+    // 只在首次加载时等待Splash并播放进场动画
+    // 后续转场由View Transition处理渐隐渐显，不播放进场动画
+    if (!runtimeWindow.__bannerInitialLoad) {
+      waitForSplashAndAnimate();
     }
     runtimeWindow.__bannerInitialLoad = true;
     initWave();
@@ -356,8 +399,8 @@ const { coverImage, isPost = false } = Astro.props;
     runtimeWindow.__siriWaveResizeBound = true;
   }
 
-  // 首次加载时播放入场动画
-  applyIntroAnimation();
+  // 首次加载时等待Splash消失后播放进场动画
+  waitForSplashAndAnimate();
   initWave();
   checkAndUpdateBackground().catch((err) => {
     console.error("Failed to initialize banner background:", err);
@@ -372,7 +415,7 @@ const { coverImage, isPost = false } = Astro.props;
   });
 </script>
 
-<style lang="less">
+<style is:global>
   .banner {
     transform: translateZ(0);
     display: flex;
@@ -393,10 +436,10 @@ const { coverImage, isPost = false } = Astro.props;
     overflow: hidden;
     -webkit-user-drag: none;
     transition: height 0.3s;
+  }
 
-    &.loadingComplete {
-      animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
+  .banner.loadingComplete {
+    animation: fade-blur-in 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   }
 
   @keyframes fade-blur-in {

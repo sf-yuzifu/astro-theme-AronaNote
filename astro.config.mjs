@@ -25,6 +25,9 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: "hover",
   },
+  build: {
+    inlineStylesheets: "always",
+  },
   markdown: {
     remarkPlugins: [remarkReadingTime, remarkMath],
     rehypePlugins: [rehypeKatex],

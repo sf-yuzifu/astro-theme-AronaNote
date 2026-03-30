@@ -42,6 +42,11 @@ interface SpineAssets {
   backHeadBone: string;
   eyeRotationAngle: number;
   voiceConfig: VoiceConfig[];
+  copyConfig?: {
+    audio?: string;
+    animation: string;
+    text: string;
+  };
 }
 
 interface SpineAssetsMap {
@@ -49,13 +54,40 @@ interface SpineAssetsMap {
   plana: SpineAssets;
 }
 
-import type { SpineCharactersConfig } from "../config";
+import type { SpineCharactersConfig, SpineCopyConfig } from "../config";
 
 const props = defineProps<{
   enabled?: boolean;
   spineVoiceLang?: "zh" | "jp";
   characters?: SpineCharactersConfig;
 }>();
+
+// 全局复制事件处理器引用（用于在模块级别添加/移除监听）
+let globalCopyHandler: ((e: Event) => void) | null = null;
+
+// 在模块加载时立即添加复制事件监听（不依赖 Vue 生命周期）
+if (typeof window !== "undefined") {
+  setTimeout(() => {
+    // 监听原生复制事件
+    const copyHandler = (e: Event) => {
+      // 调用组件内的事件处理器（如果已初始化）
+      if (globalCopyHandler) {
+        globalCopyHandler(e);
+      }
+    };
+    window.addEventListener("copy", copyHandler, true);
+
+    // 监听代码框复制按钮事件
+    const codeCopyHandler = (e: CustomEvent) => {
+      // 调用组件内的事件处理器（如果已初始化）
+      if (globalCopyHandler) {
+        // 创建一个模拟的 ClipboardEvent
+        globalCopyHandler(e as unknown as Event);
+      }
+    };
+    window.addEventListener("code-copy", codeCopyHandler as EventListener);
+  }, 100);
+}
 
 // 监听主题变化
 const isDarkMode = ref(false);
@@ -109,6 +141,15 @@ const getSpineAssets = (lang: string): SpineAssetsMap | null => {
         ...v,
         audio: replaceLang(v.audio),
       })),
+      // 处理复制配置的音频路径
+      copyConfig: chars.arona.copyConfig
+        ? {
+            ...chars.arona.copyConfig,
+            audio: chars.arona.copyConfig.audio
+              ? replaceLang(chars.arona.copyConfig.audio)
+              : undefined,
+          }
+        : undefined,
     },
     plana: {
       ...chars.plana,
@@ -116,6 +157,15 @@ const getSpineAssets = (lang: string): SpineAssetsMap | null => {
         ...v,
         audio: replaceLang(v.audio),
       })),
+      // 处理复制配置的音频路径
+      copyConfig: chars.plana.copyConfig
+        ? {
+            ...chars.plana.copyConfig,
+            audio: chars.plana.copyConfig.audio
+              ? replaceLang(chars.plana.copyConfig.audio)
+              : undefined,
+          }
+        : undefined,
     },
   };
 };
@@ -367,6 +417,85 @@ const handlePlayerClick = debounce(async (event: MouseEvent | TouchEvent) => {
     }
   }
 }, 300);
+
+// 复制事件处理函数（不使用防抖，避免引用问题）
+const handleCopyEvent = async (event: Event) => {
+  // 检查组件是否已初始化（spineAssets 是否有值）
+  if (!spineAssets.value) {
+    return;
+  }
+
+  const currentConfig = currentAssets.value;
+
+  // 检查是否有复制配置
+  if (!currentConfig?.copyConfig) {
+    return;
+  }
+
+  const copyConfig: SpineCopyConfig = currentConfig.copyConfig;
+
+  // 检查是否正在播放
+  if (isPlaying) {
+    return;
+  }
+
+  isPlaying = true;
+  isDialogPlaying = true;
+  isEyeControlDisabled.value = true;
+
+  // 重置眼睛位置
+  resetBonesState.value?.();
+
+  try {
+    // 显示对话框（先显示，再播放音频）
+    currentDialog.value = copyConfig.text;
+    showDialog.value = true;
+
+    // 更新对话框位置
+    nextTick(() => {
+      updateChatDialogPosition();
+    });
+
+    // 播放动画
+    if (spineInstance && copyConfig.animation) {
+      spineInstance.state.setAnimation(2, copyConfig.animation, false);
+    }
+
+    const startTime = Date.now();
+
+    // 如果有音频配置，加载并播放
+    if (copyConfig.audio) {
+      const buffer = await AudioManager.loadAudioFile(copyConfig.audio);
+      if (buffer) {
+        await AudioManager.playAudio(buffer);
+      }
+    }
+
+    // 等待动画和音频播放完成（至少显示2秒）
+    const minDisplayTime = 2000;
+    const elapsedTime = Date.now() - startTime;
+    if (elapsedTime < minDisplayTime) {
+      await new Promise((resolve) =>
+        setTimeout(resolve, minDisplayTime - elapsedTime),
+      );
+    }
+
+    // 清理状态
+    isPlaying = false;
+    isDialogPlaying = false;
+    isEyeControlDisabled.value = false;
+    if (spineInstance) {
+      spineInstance.state.setEmptyAnimation(2, 0);
+    }
+    showDialog.value = false;
+  } catch (error) {
+    console.error("[SpinePlayer] 复制事件处理失败:", error);
+    isPlaying = false;
+    isDialogPlaying = false;
+    isEyeControlDisabled.value = false;
+    showDialog.value = false;
+  }
+};
 
 // 提升 moveBones 函数到组件作用域以便在其他地方使用
 let moveBonesHandler: ((event: MouseEvent) => void) | null = null;
@@ -710,6 +839,8 @@ const cleanup = () => {
     window.removeEventListener("mousemove", moveBonesHandler);
     moveBonesHandler = null;
   }
+  // 注意：复制事件监听在模块级别只添加一次，不在此处清理
+  // 也不清理 globalCopyHandler，因为它在 onMounted 中重新赋值
 
   // 清理 ResizeObserver
   if (resizeObserver && playerContainer.value) {
@@ -781,10 +912,21 @@ onMounted(() => {
     window.addEventListener("mousemove", handleEvents, options);
   }
 
+  // 监听页面切换事件，确保在视图过渡后重新赋值全局处理器
+  const handlePageSwap = () => {
+    globalCopyHandler = handleCopyEvent;
+  };
+  document.addEventListener("astro:after-swap", handlePageSwap);
+
   // 如果启用了Spine播放器，初始化
   if (enabled.value) {
     debouncedInitialize();
   }
+
+  // 延迟赋值 globalCopyHandler，确保在 initializeCharacter/cleanup 执行之后
+  setTimeout(() => {
+    globalCopyHandler = handleCopyEvent;
+  }, 500);
 });
 
 onUnmounted(() => {

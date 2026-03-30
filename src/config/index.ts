@@ -126,6 +126,12 @@ export interface SpineVoiceConfig {
   text: string;
 }
 
+export interface SpineCopyConfig {
+  audio?: string;
+  animation: string;
+  text: string;
+}
+
 export interface SpineCharacterConfig {
   skelUrl: string;
   atlasUrl: string;
@@ -137,6 +143,7 @@ export interface SpineCharacterConfig {
   backHeadBone: string;
   eyeRotationAngle: number;
   voiceConfig: SpineVoiceConfig[];
+  copyConfig?: SpineCopyConfig;
 }
 
 export interface SpineCharactersConfig {

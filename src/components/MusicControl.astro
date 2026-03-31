@@ -1,0 +1,146 @@
+---
+// 音乐控制组件
+import { Icon } from "astro-icon/components";
+---
+
+<span class="music-control iconfont" id="music-control">
+  <span class="stop-icon" id="music-stop-icon">
+    <Icon name="ph:waveform-slash" />
+  </span>
+  <span class="continue-icon hidden" id="music-continue-icon">
+    <Icon name="ph:waveform" />
+  </span>
+</span>
+
+<script>
+  // 音乐控制逻辑
+  // 使用全局变量保持播放状态跨页面
+  let music: HTMLAudioElement | null = null;
+  let musicControl: HTMLElement | null = null;
+  let stopIcon: HTMLElement | null = null;
+  let continueIcon: HTMLElement | null = null;
+
+  // 从 sessionStorage 恢复播放状态
+  function getGlobalPlayingState(): boolean {
+    return sessionStorage.getItem('music-playing') === 'true';
+  }
+
+  // 保存播放状态到 sessionStorage
+  function setGlobalPlayingState(playing: boolean): void {
+    sessionStorage.setItem('music-playing', playing ? 'true' : 'false');
+  }
+
+  function initMusicControl() {
+    music = document.getElementById('background-music') as HTMLAudioElement;
+    musicControl = document.getElementById('music-control');
+    stopIcon = document.getElementById('music-stop-icon');
+    continueIcon = document.getElementById('music-continue-icon');
+
+    if (music) {
+      music.volume = 0.3; // 设置音量为30%
+
+      // 恢复之前的播放状态
+      const wasPlaying = getGlobalPlayingState();
+      if (wasPlaying) {
+        music.play().catch((err) => {
+          console.log('自动播放失败: ', err);
+          setGlobalPlayingState(false);
+          updateIcon(false);
+        });
+        updateIcon(true);
+      } else {
+        music.pause();
+        updateIcon(false);
+      }
+    }
+
+    // 移除旧的事件监听器
+    if (musicControl) {
+      musicControl.removeEventListener('click', toggleMusic);
+      // 绑定点击事件
+      musicControl.addEventListener('click', toggleMusic);
+    }
+  }
+
+  function toggleMusic(e: Event) {
+    e.stopPropagation(); // 防止触发下拉菜单关闭
+
+    if (music) {
+      const isPlaying = !music.paused;
+      if (isPlaying) {
+        music.pause();
+        setGlobalPlayingState(false);
+        updateIcon(false);
+      } else {
+        music.play().catch((err) => console.log('播放失败: ', err));
+        setGlobalPlayingState(true);
+        updateIcon(true);
+      }
+    }
+  }
+
+  function updateIcon(playing: boolean) {
+    if (stopIcon && continueIcon) {
+      if (playing) {
+        stopIcon.classList.add('hidden');
+        continueIcon.classList.remove('hidden');
+      } else {
+        continueIcon.classList.add('hidden');
+        stopIcon.classList.remove('hidden');
+      }
+    }
+  }
+
+  // 页面加载完成后初始化
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMusicControl);
+  } else {
+    initMusicControl();
+  }
+
+  // 页面切换后重新初始化（Astro 视图过渡）
+  document.addEventListener('astro:after-swap', initMusicControl);
+</script>
+
+<style lang="less">
+  .music-control {
+    cursor: pointer;
+    font-size: max(2vw, 4vh);
+    color: var(--font-color-grey);
+    transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+
+    .stop-icon,
+    .continue-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      &.hidden {
+        display: none;
+      }
+    }
+
+    :global(svg) {
+      width: max(2vw, 4vh);
+      height: max(2vw, 4vh);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .music-control {
+      font-size: 4vh;
+
+      :global(svg) {
+        width: 4vh;
+        height: 4vh;
+      }
+    }
+  }
+</style>

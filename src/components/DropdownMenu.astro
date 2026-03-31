@@ -1,16 +1,16 @@
 ---
 import ThemeToggle from "./ThemeToggle.astro";
 import SearchButton from "./SearchButton.astro";
-import { FEATURE_SEARCH, FEATURE_THEME_TOGGLE } from "../consts";
+import MusicControl from "./MusicControl.astro";
+import { FEATURE_SEARCH, FEATURE_THEME_TOGGLE, FEATURE_MUSIC } from "../consts";
 ---
 
 <div class="dropdown-menu" id="dropdown-menu">
   <div class="menu-content">
-    {
-      (FEATURE_SEARCH || FEATURE_THEME_TOGGLE) && (
-        <div class="first-row">{FEATURE_SEARCH && <SearchButton />}</div>
-      )
-    }
+    <div class="first-row">
+      {FEATURE_MUSIC && <MusicControl />}
+      {FEATURE_SEARCH && <SearchButton />}
+    </div>
     {FEATURE_THEME_TOGGLE && <ThemeToggle />}
   </div>
 </div>
@@ -121,22 +121,22 @@ import { FEATURE_SEARCH, FEATURE_THEME_TOGGLE } from "../consts";
       position: relative;
       background-color: var(--foreground-color);
       border-radius: 32px;
-      padding: 1.2vw;
-      gap: 0.8vw;
+      padding: max(1.2vw, 2vh);
+      gap: max(0.8vw, 1vh);
       display: flex;
       flex-direction: column;
       align-items: center;
+    }
 
-      .first-row {
-        display: flex;
-        gap: 0.4vw;
-        padding: 0.3vw;
-        padding-bottom: 1vh;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        border-bottom: 1px dashed var(--font-color-grey);
-      }
+    .first-row {
+      display: flex;
+      gap: 0.4vw;
+      padding: 0.3vw;
+      padding-bottom: 1vh;
+      width: 100%;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px dashed var(--font-color-grey);
     }
   }
 
@@ -171,6 +171,12 @@ import { FEATURE_SEARCH, FEATURE_THEME_TOGGLE } from "../consts";
         border-radius: 3vh;
         padding: 2vh;
         gap: 1vh;
+      }
+
+      .first-row {
+        gap: 0.5vh;
+        padding: 0.3vh;
+        padding-bottom: 1vh;
       }
     }
   }

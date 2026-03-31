@@ -1,54 +1,69 @@
 ---
 // 搜索按钮组件
+import { Icon } from "astro-icon/components";
 ---
 
-<span class="search-btn" id="search-btn" title="搜索">
-  <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-    <path
-      d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
-    ></path>
-  </svg>
+<span class="search-btn iconfont" id="search-btn" title="搜索">
+  <Icon name="ph:magnifying-glass-bold" />
 </span>
 
 <script is:inline>
   (function () {
-    const searchBtn = document.getElementById("search-btn");
-    if (searchBtn) {
-      searchBtn.addEventListener("click", () => {
-        // 触发自定义事件打开搜索对话框
-        window.dispatchEvent(new CustomEvent("open-search-dialog"));
-      });
+    function initSearchButton() {
+      const searchBtn = document.getElementById("search-btn");
+      if (searchBtn) {
+        // 移除旧的事件监听器
+        searchBtn.removeEventListener("click", handleClick);
+        // 添加新的事件监听器
+        searchBtn.addEventListener("click", handleClick);
+      }
     }
+
+    function handleClick() {
+      // 触发自定义事件打开搜索对话框
+      window.dispatchEvent(new CustomEvent("open-search-dialog"));
+    }
+
+    // 初始化
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initSearchButton);
+    } else {
+      initSearchButton();
+    }
+
+    // 页面切换后重新初始化
+    document.addEventListener("astro:after-swap", initSearchButton);
   })();
 </script>
 
-<style>
+<style lang="less">
   .search-btn {
     cursor: pointer;
+    font-size: max(2vw, 4vh);
     color: var(--font-color-grey);
     transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 8px;
-    border-radius: 8px;
-  }
 
-  .search-btn:hover {
-    transform: translateY(-3px);
-    color: var(--font-color-gold);
-    background-color: var(--btn-background);
-  }
+    &:hover {
+      transform: translateY(-3px);
+    }
 
-  .search-btn svg {
-    width: 24px;
-    height: 24px;
+    :global(svg) {
+      width: max(2vw, 4vh);
+      height: max(2vw, 4vh);
+    }
   }
 
   @media (max-width: 768px) {
-    .search-btn svg {
-      width: 20px;
-      height: 20px;
+    .search-btn {
+      font-size: 4vh;
+
+      :global(svg) {
+        width: 4vh;
+        height: 4vh;
+      }
     }
   }
 </style>

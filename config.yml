@@ -139,6 +139,8 @@ features:
   pageTransition: true
   # 阅读时间估算
   readingTime: true
+  # 背景音乐
+  music: true
 
 # Spine Live2D 配置
 spine:

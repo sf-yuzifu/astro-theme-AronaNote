@@ -113,6 +113,7 @@ export interface FeaturesConfig {
   themeToggle: boolean;
   pageTransition: boolean;
   readingTime: boolean;
+  music: boolean;
 }
 
 export interface HitokotoConfig {

@@ -91,6 +91,7 @@ export const FEATURE_BACK_TO_TOP = featuresConfig.backToTop;
 export const FEATURE_THEME_TOGGLE = featuresConfig.themeToggle;
 export const FEATURE_PAGE_TRANSITION = featuresConfig.pageTransition;
 export const FEATURE_READING_TIME = featuresConfig.readingTime;
+export const FEATURE_MUSIC = featuresConfig.music;
 
 // 一言配置
 const hitokotoConfig = getHitokotoConfig();

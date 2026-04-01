@@ -174,12 +174,35 @@ const searchData = posts.map((post) => ({
         }
       }
 
+      // 键盘快捷键处理
+      function handleKeydown(e) {
+        // / 键打开搜索（不在输入框中时）
+        if (e.key === "/" && !isInputElement(document.activeElement)) {
+          e.preventDefault();
+          openDialog();
+        }
+        // Esc 键关闭搜索
+        if (e.key === "Escape" && dialog.classList.contains("show-dialog")) {
+          e.preventDefault();
+          closeDialog();
+        }
+      }
+
+      // 判断是否为输入元素
+      function isInputElement(element) {
+        if (!element) return false;
+        const tagName = element.tagName.toLowerCase();
+        const inputTypes = ["input", "textarea", "select"];
+        return inputTypes.includes(tagName) || element.isContentEditable;
+      }
+
       // 清理旧事件监听
       document.removeEventListener("open-search-dialog", openDialog);
       closeBtn?.removeEventListener("click", closeDialog);
       cover?.removeEventListener("click", closeDialog);
       searchInput?.removeEventListener("input", handleSearch);
       searchList?.removeEventListener("click", handleSearchListClick);
+      document.removeEventListener("keydown", handleKeydown);
 
       // 绑定事件
       window.addEventListener("open-search-dialog", openDialog);
@@ -187,6 +210,7 @@ const searchData = posts.map((post) => ({
       cover?.addEventListener("click", closeDialog);
       searchInput?.addEventListener("input", handleSearch);
       searchList?.addEventListener("click", handleSearchListClick);
+      document.addEventListener("keydown", handleKeydown);
 
       // 初始化隐藏
       dialog.style.display = "none";

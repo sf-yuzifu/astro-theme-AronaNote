@@ -47,9 +47,15 @@
 - **数学公式**: [KaTeX](https://katex.org/) - 快速数学排版
 - **评论系统**: [Waline](https://waline.js.org/) - 简洁安全的评论系统
 - **图片浏览**: [PhotoSwipe](https://photoswipe.com/) - 触摸优化的图片灯箱
+- **渲染引擎**: [PixiJS](https://pixijs.com/) - 高性能 2D WebGL 渲染器
 - **动画模型**: [Spine](https://esotericsoftware.com/) - 2D 骨骼动画
 - **音频引擎**: [Howler.js](https://howlerjs.com/) - Web Audio API 音频库
 - **图标**: [Astro Icon](https://www.astroicon.dev/) + [Phosphor Icons](https://phosphoricons.com/) + [Font Awesome](https://fontawesome.com/)
+- **PWA**: [@vite-pwa/astro](https://vite-pwa-org.netlify.app/frameworks/astro.html) - Astro PWA 插件
+- **进度条**: [NProgress](https://ricostacruz.com/nprogress/) - 页面加载进度指示器
+- **图片处理**: [Sharp](https://sharp.pixelplumbing.com/) - 高性能 Node.js 图像处理库
+- **阅读时间**: [reading-time](https://github.com/ngryman/reading-time) - 文章阅读时间估算
+- **YAML 解析**: [js-yaml](https://github.com/nodeca/js-yaml) - YAML 解析器和序列化器
 
 ## 快速开始
 

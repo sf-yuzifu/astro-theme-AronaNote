@@ -15,9 +15,13 @@ const pageSize = Astro.props.pageSize || 10;
 
 // 如果没有传入 posts，则默认获取全部 blog 集合
 if (!posts) {
-  posts = (await getCollection("blog")).sort(
-    (a, b) => b.data.pubDate!.valueOf() - a.data.pubDate!.valueOf(),
-  );
+  posts = (await getCollection("blog")).sort((a, b) => {
+    // 首先按 pinned 排序（数值大的置顶）
+    const pinnedDiff = (b.data.pinned || 0) - (a.data.pinned || 0);
+    if (pinnedDiff !== 0) return pinnedDiff;
+    // 然后按发布时间排序（新的在前）
+    return b.data.pubDate!.valueOf() - a.data.pubDate!.valueOf();
+  });
 }
 
 // 为所有文章提前渲染出 frontmatter，以获取 remark 插件注入的字数等信息
@@ -69,6 +73,11 @@ const hasPagination = totalPages > 1;
                 <div class="title">
                   {!post.data.heroImage && <div class="title-dot" />}
                   <h1 class="name">
+                    {post.data.pinned ? (
+                      <span class="pinned-badge" title="置顶文章">
+                        <Icon name="ph:push-pin-fill" class="pinned-icon" />
+                      </span>
+                    ) : null}
                     <a href={`/blog/${post.id}/`}>{post.data.title}</a>
                   </h1>
                 </div>
@@ -397,10 +406,23 @@ const hasPagination = totalPages > 1;
               transition: background 0.5s;
             }
 
+            .pinned-badge {
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              color: var(--color-blue, #ff6b6b);
+              margin-right: 8px;
+
+              .pinned-icon {
+                width: 20px;
+                height: 20px;
+              }
+            }
+
             .name {
               display: flex;
               align-items: center;
-              gap: 15px;
+              gap: 4px;
               font-size: 28px;
               margin-bottom: 0;
               line-height: 1.2;

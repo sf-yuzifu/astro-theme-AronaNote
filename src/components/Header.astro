@@ -16,6 +16,9 @@ const menuList = NAV_ITEMS;
 ---
 
 <header class:list={["container", { postViewer: isPost }]}>
+  <div class="reading-progress-bar" id="reading-progress-bar">
+    <div class="reading-progress-fill" id="reading-progress-fill"></div>
+  </div>
   <nav transition:persist>
     <span class="logo">
       <a href="/" class="nav-link">
@@ -212,4 +215,83 @@ const menuList = NAV_ITEMS;
       }
     }
   }
+
+  // 阅读进度条样式
+  .reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: transparent;
+    z-index: 101;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+
+    &.visible {
+      opacity: 1;
+    }
+
+    .reading-progress-fill {
+      height: 100%;
+      background: var(--color-blue, #328cfa);
+      width: 0%;
+      transition: width 0.1s ease-out;
+    }
+  }
 </style>
+
+<script is:inline>
+  (function () {
+    function initReadingProgress() {
+      const progressBar = document.getElementById("reading-progress-bar");
+      const progressFill = document.getElementById("reading-progress-fill");
+      if (!progressBar || !progressFill) return;
+
+      function updateProgress() {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const docHeight =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        progressFill.style.width = progress + "%";
+
+        // 滚动超过一定距离后显示进度条
+        if (scrollTop > 100) {
+          progressBar.classList.add("visible");
+        } else {
+          progressBar.classList.remove("visible");
+        }
+      }
+
+      // 使用 requestAnimationFrame 优化性能
+      let ticking = false;
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(function () {
+            updateProgress();
+            ticking = false;
+          });
+          ticking = true;
+        }
+      }
+
+      // 清理旧事件监听
+      window.removeEventListener("scroll", onScroll);
+      // 绑定事件
+      window.addEventListener("scroll", onScroll, { passive: true });
+      // 初始化
+      updateProgress();
+    }
+
+    // 初始化
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initReadingProgress);
+    } else {
+      initReadingProgress();
+    }
+
+    // 页面切换后重新初始化
+    document.addEventListener("astro:after-swap", initReadingProgress);
+  })();
+</script>

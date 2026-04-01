@@ -24,6 +24,7 @@ import { getMusicConfig } from "../config";
   let musicControl: HTMLElement | null = null;
   let stopIcon: HTMLElement | null = null;
   let continueIcon: HTMLElement | null = null;
+  let isInitialized = false;
 
   function updateIcon(playing: boolean) {
     if (stopIcon && continueIcon) {
@@ -38,6 +39,9 @@ import { getMusicConfig } from "../config";
   }
 
   async function initMusicControl() {
+    if (isInitialized) return;
+    isInitialized = true;
+
     musicControl = document.getElementById("music-control");
     stopIcon = document.getElementById("music-stop-icon");
     continueIcon = document.getElementById("music-continue-icon");

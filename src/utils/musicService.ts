@@ -13,6 +13,9 @@ let isPlaying = false;
 let onStateChange: ((playing: boolean) => void) | null = null;
 let playedIds = new Set<number>();
 let unplayedPool: number[] = [];
+let currentSongId: number | null = null;
+let isInitialized = false;
+let isPlayingNext = false;
 
 function initPool() {
   if (!settings) return;
@@ -58,63 +61,81 @@ async function fetchSongUrl(id: number): Promise<string | null> {
 
 function stopCurrent() {
   if (currentHowl) {
+    currentHowl.stop();
     currentHowl.unload();
     currentHowl = null;
+    currentSongId = null;
   }
 }
 
-function playSong(songUrl: string) {
-  stopCurrent();
-  currentHowl = new Howl({
-    src: [songUrl],
-    html5: true,
-    volume: settings?.volume ?? 0.3,
-    onplay: () => {
-      isPlaying = true;
-      onStateChange?.(true);
-    },
-    onpause: () => {
-      isPlaying = false;
-      onStateChange?.(false);
-    },
-    onstop: () => {
-      isPlaying = false;
-      onStateChange?.(false);
-    },
-    onend: () => {
-      playNext();
-    },
-    onloaderror: () => {
-      console.warn("[Music] 加载失败");
-      playNext();
-    },
+function playSong(songUrl: string, songId: number): Promise<void> {
+  return new Promise((resolve) => {
+    stopCurrent();
+    currentSongId = songId;
+    currentHowl = new Howl({
+      src: [songUrl],
+      html5: true,
+      volume: settings?.volume ?? 0.3,
+      onplay: () => {
+        isPlaying = true;
+        isPlayingNext = false;
+        onStateChange?.(true);
+      },
+      onpause: () => {
+        isPlaying = false;
+        onStateChange?.(false);
+      },
+      onstop: () => {
+        isPlaying = false;
+        onStateChange?.(false);
+      },
+      onend: () => {
+        resolve();
+      },
+      onloaderror: () => {
+        console.warn("[Music] 加载失败");
+        resolve();
+      },
+    });
+    currentHowl.play();
   });
-  currentHowl.play();
 }
 
 async function playNext() {
+  if (isPlayingNext) return;
+  isPlayingNext = true;
+
   const id = pickRandomId();
-  if (!id) return;
+  if (!id) {
+    isPlayingNext = false;
+    return;
+  }
   const songUrl = await fetchSongUrl(id);
   if (songUrl) {
-    playSong(songUrl);
+    await playSong(songUrl, id);
   } else {
+    isPlayingNext = false;
     setTimeout(playNext, 2000);
   }
 }
 
 export function initMusic(onChange: (playing: boolean) => void) {
   onStateChange = onChange;
-  initPool();
+  if (!isInitialized) {
+    initPool();
+    isInitialized = true;
+  }
   const wasPlaying = sessionStorage.getItem("music-playing") === "true";
-  if (wasPlaying) {
+  if (wasPlaying && !currentHowl) {
     playNext();
   }
 }
 
 export function configureMusic(musicConfig: MusicSettings) {
   settings = musicConfig;
-  initPool();
+  if (!isInitialized) {
+    initPool();
+  }
 }
 
 export function toggleMusic(): boolean {

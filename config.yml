@@ -241,3 +241,26 @@ hitokoto:
     - "Stay hungry, stay foolish."
     - "Talk is cheap. Show me the code."
     - "The journey of a thousand miles begins with one step."
+
+# 背景音乐配置
+music:
+  # 是否启用（需要 features.music 也为 true）
+  enable: true
+  # 音乐 API 地址，{id} 会被替换为歌曲 ID
+  api: "https://www.lihouse.xyz/coco_widget/music_resource/id/{id}"
+  # 曲库歌曲 ID 列表（随机播放）
+  songIds:
+    - 2093257373
+    - 2098473565
+    - 2098478355
+    - 2098473572
+    - 2099308172
+    - 2099310789
+    - 2098477269
+    - 2098478097
+    - 2630220461
+    - 2630217054
+  # 音量（0-1，默认 0.3）
+  volume: 0.3
+  # 音乐 URL 在返回 JSON 中的字段路径，用 . 分隔层级（默认 "song_data.url"）
+  urlField: "song_data.url"

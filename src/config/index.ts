@@ -147,7 +147,7 @@ export interface SpineCharacterConfig {
   copyConfig?: SpineCopyConfig;
   // 位置偏移配置（百分比，可选）
   offset?: {
-    left?: string;  // 例如: "5%", "10%", "-5%"
+    left?: string; // 例如: "5%", "10%", "-5%"
     bottom?: string; // 例如: "20px", "5vh"
   };
 }
@@ -163,6 +163,14 @@ export interface SpineConfig {
   characters: SpineCharactersConfig;
 }
 
+export interface MusicConfig {
+  enable: boolean;
+  api: string;
+  songIds: number[];
+  volume?: number;
+  urlField?: string;
+}
+
 export interface Config {
   site: SiteConfig;
   nav: NavItem[];
@@ -175,6 +183,7 @@ export interface Config {
   features: FeaturesConfig;
   hitokoto: HitokotoConfig;
   spine: SpineConfig;
+  music: MusicConfig;
 }
 
 /**
@@ -267,6 +276,11 @@ export function getHitokotoConfig(): HitokotoConfig {
 export function getSpineConfig(): SpineConfig {
   const config = loadConfig();
   return config.spine || { enable: false, voiceLang: "zh" };
+}
+
+export function getMusicConfig(): MusicConfig {
+  const config = loadConfig();
+  return config.music || { enable: false, api: "", songIds: [] };
 }
 
 // 默认导出完整配置

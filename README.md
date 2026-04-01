@@ -28,6 +28,7 @@
 - [x] 阅读时间估算
 - [x] 友链页面
 - [x] 项目展示页面
+- [x] 背景音乐播放（Howler.js + 随机曲库）
 
 ## 技术栈
 
@@ -39,6 +40,7 @@
 - **评论系统**: [Waline](https://waline.js.org/) - 简洁安全的评论系统
 - **图片浏览**: [PhotoSwipe](https://photoswipe.com/) - 触摸优化的图片灯箱
 - **动画模型**: [Spine](https://esotericsoftware.com/) - 2D 骨骼动画
+- **音频引擎**: [Howler.js](https://howlerjs.com/) - Web Audio API 音频库
 - **图标**: [Astro Icon](https://www.astroicon.dev/) + [Phosphor Icons](https://phosphoricons.com/) + [Font Awesome](https://fontawesome.com/)
 
 ## 快速开始
@@ -202,6 +204,21 @@ hitokoto:
   list:
     - "生活不止眼前的苟且，还有诗和远方。"
     - "Stay hungry, stay foolish."
+
+# 背景音乐配置
+music:
+  # 是否启用（需要 features.music 也为 true）
+  enable: true
+  # 音乐 API 地址，{id} 会被替换为歌曲 ID
+  api: "https://your-music-api.com/song/{id}"
+  # 曲库歌曲 ID 列表（随机播放）
+  songIds:
+    - 12345678
+    - 87654321
+  # 音量（0-1，默认 0.3）
+  volume: 0.3
+  # 音乐 URL 在返回 JSON 中的字段路径，用 . 分隔层级
+  urlField: "data.url"
 ```
 
 ## 文章配置

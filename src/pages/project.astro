@@ -36,7 +36,7 @@ function isExternalUrl(url: string): boolean {
               <div class="project-icon">
                 {project.image ? (
                   isExternalUrl(project.image) ? (
-                    <img src={project.image} alt={project.name} class="project-img" />
+                    <img src={project.image} alt={project.name} class="project-img" loading="lazy" />
                   ) : (
                     <Image src={project.image} alt={project.name} class="project-img" width={64} height={64} />
                   )

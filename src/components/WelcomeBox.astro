@@ -46,7 +46,7 @@ const avatarSrc = isExternalAvatar ? SITE_AVATAR : null;
     <div class="info-box" id="info-box-el">
       {
         avatarSrc ? (
-          <img src={avatarSrc} alt="avatar" class="avatar" />
+          <img src={avatarSrc} alt="avatar" class="avatar" loading="lazy" />
         ) : (
           <Image src={avatarImage} alt="avatar" class="avatar" />
         )

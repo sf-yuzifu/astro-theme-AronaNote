@@ -108,19 +108,19 @@ const coverUrl = coverImage
     <!-- 搜索对话框 -->
     {FEATURE_SEARCH && <SearchDialog />}
 
-    <!-- Spine Live2D - 保持持久化 -->
+    <!-- Spine Live2D - client:only 组件不需要 transition:persist -->
     {
       SPINE_ENABLE && (
-        <SpinePlayer
-          client:only="vue"
-          enabled={true}
-          spineVoiceLang={SPINE_VOICE_LANG}
-          characters={SPINE_CHARACTERS}
-          transition:persist="spine-player"
-        />
+        <div data-astro-transition-persist="spine-player">
+          <SpinePlayer
+            client:only="vue"
+            enabled={true}
+            spineVoiceLang={SPINE_VOICE_LANG}
+            characters={SPINE_CHARACTERS}
+          />
+        </div>
       )
     }
-
   </body>
 </html>
 

@@ -6,7 +6,8 @@ export async function getStaticPaths() {
   const posts = await getCollection("blog");
   const sortedPosts = posts.sort(
     (a, b) =>
-      new Date(b.data.pubDate).valueOf() - new Date(a.data.pubDate).valueOf(),
+      new Date(b.data.pubDate ?? 0).valueOf() -
+      new Date(a.data.pubDate ?? 0).valueOf(),
   );
   return sortedPosts.map((post, index) => ({
     params: { slug: post.id },
@@ -25,7 +26,7 @@ type Props = {
 };
 
 const { post, prevPost, nextPost } = Astro.props;
-const { Content, remarkPluginFrontmatter } = await render(post);
+const { Content, remarkPluginFrontmatter, headings } = await render(post);
 
 // Get enable flags from frontmatter with defaults
 const enableDonation = post.data.enableDonation ?? true;
@@ -40,6 +41,7 @@ const enableNavigation = post.data.enableNavigation ?? true;
   nextPost={nextPost}
   enableDonation={enableDonation}
   enableNavigation={enableNavigation}
+  headings={headings}
 >
   <Content />
 </BlogPost>

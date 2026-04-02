@@ -1,0 +1,416 @@
+---
+// 文章目录导航组件 (TOC)
+export interface Props {
+  headings: {
+    depth: number;
+    slug: string;
+    text: string;
+  }[];
+}
+
+const { headings } = Astro.props;
+
+// 过滤出 h2 和 h3 标题，并构建层级结构
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+
+// 将 h3 归类到对应的 h2 下
+const tocTree: { h2: (typeof tocHeadings)[0]; h3s: typeof tocHeadings }[] = [];
+let currentH2: (typeof tocHeadings)[0] | null = null;
+let currentH3s: typeof tocHeadings = [];
+
+tocHeadings.forEach((heading) => {
+  if (heading.depth === 2) {
+    if (currentH2) {
+      tocTree.push({ h2: currentH2, h3s: currentH3s });
+    }
+    currentH2 = heading;
+    currentH3s = [];
+  } else if (heading.depth === 3 && currentH2) {
+    currentH3s.push(heading);
+  }
+});
+
+// 添加最后一个 h2
+if (currentH2) {
+  tocTree.push({ h2: currentH2, h3s: currentH3s });
+}
+---
+
+{
+  tocTree.length > 0 && (
+    <nav class="toc-container" aria-label="文章目录">
+      <div class="toc-header">
+        <span class="toc-title">目录</span>
+      </div>
+      <ul class="toc-list">
+        {tocTree.map(({ h2, h3s }) => (
+          <li class="toc-item toc-level-2" data-h2-slug={h2.slug}>
+            <a href={`#${h2.slug}`} class="toc-link" data-depth="2">
+              {h2.text}
+            </a>
+            {h3s.length > 0 && (
+              <ul class="toc-sub-list">
+                {h3s.map((h3) => (
+                  <li class="toc-item toc-level-3">
+                    <a
+                      href={`#${h3.slug}`}
+                      class="toc-link"
+                      data-depth="3"
+                      data-parent-slug={h2.slug}
+                    >
+                      {h3.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+<script>
+  // 高亮当前可见的目录项
+  function initTOC() {
+    const tocLinks = document.querySelectorAll(".toc-link");
+    const headings = document.querySelectorAll(
+      "article h2[id], article h3[id]",
+    );
+
+    if (!tocLinks.length || !headings.length) return;
+
+    // 标记是否正在点击跳转（避免滚动动画期间更新高亮）
+    let isClickScrolling = false;
+    let clickScrollTimeout:
+      | string
+      | number
+      | NodeJS.Timeout
+      | null
+      | undefined = null;
+
+    // 点击目录项平滑滚动
+    tocLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        const targetId = link.getAttribute("href")?.slice(1);
+        const target = document.getElementById(targetId || "");
+        if (target) {
+          // 标记正在点击跳转
+          isClickScrolling = true;
+          if (clickScrollTimeout) {
+            clearTimeout(clickScrollTimeout);
+          }
+
+          // 立即高亮点击的项
+          tocLinks.forEach((l) => l.classList.remove("active"));
+          link.classList.add("active");
+
+          target.scrollIntoView({ behavior: "smooth" });
+          // 更新 URL hash
+          history.pushState(null, "", `#${targetId}`);
+
+          // 滚动动画结束后恢复滚动监听
+          // 使用 scrollend 事件（如果浏览器支持）或延长超时时间
+          const onScrollEnd = () => {
+            isClickScrolling = false;
+            window.removeEventListener("scrollend", onScrollEnd);
+            if (clickScrollTimeout) {
+              clearTimeout(clickScrollTimeout);
+            }
+          };
+
+          // 优先使用 scrollend 事件
+          if ("onscrollend" in window) {
+            window.addEventListener("scrollend", onScrollEnd, { once: true });
+          }
+
+          // 兜底：800ms 后强制恢复
+          clickScrollTimeout = setTimeout(() => {
+            isClickScrolling = false;
+            window.removeEventListener("scrollend", onScrollEnd);
+          }, 800);
+        }
+      });
+    });
+
+    // 获取元素相对于文档顶部的绝对位置
+    function getAbsoluteTop(element: Element) {
+      let top = 0;
+      let el = element;
+      while (el) {
+        top += (el as HTMLElement).offsetTop;
+        el = (el as HTMLElement).offsetParent as HTMLElement;
+      }
+      return top;
+    }
+
+    // 高亮当前可见的目录项
+    function highlightCurrentHeading() {
+      const viewportTop = window.scrollY + 20; // 视口顶部偏移量（考虑固定头部）
+
+      let currentHeading = null;
+      let minDistance = Infinity;
+
+      // 遍历所有标题，找最靠近视口顶部的标题
+      headings.forEach((heading) => {
+        const headingTop = getAbsoluteTop(heading);
+
+        // 只考虑在视口顶部或上方的标题
+        if (headingTop <= viewportTop) {
+          const distance = viewportTop - headingTop;
+
+          // 找距离最小的（最靠近顶部的）
+          if (distance < minDistance) {
+            minDistance = distance;
+            currentHeading = heading;
+          }
+        }
+      });
+
+      // 如果没有找到（所有标题都在视口下方），则高亮第一个
+      if (!currentHeading && headings.length > 0) {
+        currentHeading = headings[0];
+      }
+
+      if (currentHeading) {
+        const id = currentHeading.getAttribute("id");
+        const depth = currentHeading.tagName === "H2" ? 2 : 3;
+
+        // 更新高亮状态
+        tocLinks.forEach((link) => {
+          link.classList.remove("active");
+          if (link.getAttribute("href") === `#${id}`) {
+            link.classList.add("active");
+          }
+        });
+
+        // 控制 h3 的显示/隐藏
+        if (id) {
+          updateTocVisibility(id, depth);
+        }
+      }
+    }
+
+    // 更新 TOC 显示状态
+    function updateTocVisibility(activeId: string, activeDepth: number) {
+      // 获取当前激活的 h2 slug
+      let activeH2Slug: string | null = null;
+
+      if (activeDepth === 2) {
+        activeH2Slug = activeId;
+      } else {
+        // 如果是 h3，找到对应的父 h2
+        const activeLink = document.querySelector(
+          `.toc-link[href="#${activeId}"]`,
+        );
+        if (activeLink) {
+          activeH2Slug = activeLink.getAttribute("data-parent-slug");
+        }
+      }
+
+      // 控制所有 h3 列表的显示/隐藏
+      document.querySelectorAll(".toc-sub-list").forEach((subList) => {
+        const parentLi = subList.closest(".toc-level-2");
+        const parentSlug = parentLi?.getAttribute("data-h2-slug");
+
+        if (parentSlug === activeH2Slug) {
+          subList.classList.add("is-visible");
+        } else {
+          subList.classList.remove("is-visible");
+        }
+      });
+
+      // 控制 h2 的显示（非激活的 h2 可以淡化显示）
+      document.querySelectorAll(".toc-level-2 > .toc-link").forEach((link) => {
+        const h2Slug = link.getAttribute("href")?.slice(1);
+        if (h2Slug === activeH2Slug) {
+          link.classList.add("is-current-h2");
+        } else {
+          link.classList.remove("is-current-h2");
+        }
+      });
+    }
+
+    // 使用 requestAnimationFrame 节流滚动事件
+    let ticking = false;
+    function onScroll() {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          highlightCurrentHeading();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }
+
+    // 绑定滚动事件
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // 初始高亮
+    highlightCurrentHeading();
+
+    // 默认显示第一个 h2 的 h3 列表
+    const firstH2 = document.querySelector(".toc-level-2[data-h2-slug]");
+    if (firstH2) {
+      const firstSlug = firstH2.getAttribute("data-h2-slug");
+      if (firstSlug) {
+        updateTocVisibility(firstSlug, 2);
+      }
+    }
+
+    // 清理函数
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }
+
+  // 初始化
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initTOC);
+  } else {
+    initTOC();
+  }
+
+  // 页面切换后重新初始化
+  document.addEventListener("astro:after-swap", initTOC);
+</script>
+
+<style lang="less">
+  .toc-container {
+    position: sticky;
+    top: 12px;
+    width: 228px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--foreground-color);
+    border: solid 2px var(--foreground-color);
+    border-radius: 32px;
+    box-shadow: 0px 0px 8px rgb(var(--blue-shadow-color), 0.8);
+    transition:
+      border 0.5s,
+      background 0.5s,
+      box-shadow 0.5s;
+
+    // 自定义滚动条
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--color-text-secondary);
+      border-radius: 2px;
+    }
+  }
+
+  .toc-header {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .toc-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--color-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .toc-item {
+    margin: 4px 0;
+  }
+
+  // h2 链接样式
+  .toc-level-2 > .toc-link {
+    font-weight: bold;
+    color: var(--color-text-primary);
+    opacity: 0.6;
+    transition:
+      color 0.2s,
+      background-color 0.2s,
+      opacity 0.2s;
+
+    // 当前激活的 h2
+    &.is-current-h2 {
+      opacity: 1;
+    }
+
+    // 当前激活的 h2 且被高亮
+    &.active {
+      opacity: 1;
+    }
+  }
+
+  // h3 子列表
+  .toc-sub-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition:
+      max-height 0.3s ease,
+      opacity 0.3s ease,
+      margin 0.3s ease;
+
+    // 显示状态
+    &.is-visible {
+      max-height: 500px; // 足够大的值以容纳内容
+      opacity: 1;
+      margin: 4px 0 8px 0;
+    }
+  }
+
+  .toc-level-3 {
+    padding-left: 12px;
+
+    .toc-link {
+      font-size: 12px;
+    }
+  }
+
+  .toc-link {
+    display: block;
+    padding: 6px 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: 6px;
+    transition:
+      color 0.2s,
+      background-color 0.2s;
+
+    &:hover {
+      color: var(--color-blue);
+      background-color: rgba(var(--blue-shadow-color), 0.1);
+    }
+
+    &.active {
+      color: var(--color-blue);
+      background-color: rgba(var(--blue-shadow-color), 0.15);
+      font-weight: 500;
+    }
+  }
+
+  // 移动端隐藏
+  @media (max-width: 1024px) {
+    .toc-container {
+      display: none;
+    }
+  }
+</style>

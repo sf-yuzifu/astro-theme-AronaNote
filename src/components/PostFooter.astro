@@ -51,7 +51,11 @@ const sponsorMethods = SPONSOR_METHODS;
                 </button>
                 {method.image && (
                   <div class="donation-qr">
-                    <img src={method.image} alt={`${method.name}`} loading="lazy" />
+                    <img
+                      src={method.image}
+                      alt={`${method.name}`}
+                      loading="lazy"
+                    />
                   </div>
                 )}
               </div>
@@ -102,7 +106,7 @@ const sponsorMethods = SPONSOR_METHODS;
   .donation-section {
     box-sizing: border-box;
     margin: 32px auto 0;
-    max-width: 1200px;
+    max-width: calc(1200px + 48px);
   }
 
   .donation-container {
@@ -214,7 +218,7 @@ const sponsorMethods = SPONSOR_METHODS;
   .post-navigation {
     box-sizing: border-box;
     margin: 32px auto 0;
-    max-width: 1200px;
+    max-width: calc(1200px + 48px);
   }
 
   .nav-container {
@@ -283,12 +287,12 @@ const sponsorMethods = SPONSOR_METHODS;
     transition: color 0.5s;
   }
 
-  @media (max-width: 768px) {
-    .donation-section,
-    .post-navigation {
-      padding: 0 24px;
-    }
+  .donation-section,
+  .post-navigation {
+    padding: 0 24px;
+  }
 
+  @media (max-width: 768px) {
     .donation-container {
       padding: 20px;
     }

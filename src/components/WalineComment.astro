@@ -125,7 +125,7 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
   .waline-comment {
     box-sizing: border-box;
     margin: 32px auto 0;
-    max-width: 1200px;
+    max-width: calc(1200px + 48px);
   }
 
   /* 评论框面板 */
@@ -173,10 +173,7 @@ const serverURL = COMMENTS_WALINE_SERVER_URL;
     font-size: 16px;
   }
 
-  /* 移动端适配 */
-  @media (max-width: 768px) {
-    .waline-comment {
-      padding: 0 24px;
-    }
+  .waline-comment {
+    padding: 0 24px;
   }
 </style>

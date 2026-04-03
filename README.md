@@ -37,6 +37,7 @@
 - [x] 图片懒加载
 - [x] 文章阅读进度条
 - [x] 路由跳转进度条（NProgress）
+- [x] 追番页面（Bilibili 番剧追踪）
 
 ## 技术栈
 
@@ -56,6 +57,7 @@
 - **图片处理**: [Sharp](https://sharp.pixelplumbing.com/) - 高性能 Node.js 图像处理库
 - **阅读时间**: [reading-time](https://github.com/ngryman/reading-time) - 文章阅读时间估算
 - **YAML 解析**: [js-yaml](https://github.com/nodeca/js-yaml) - YAML 解析器和序列化器
+- **追番集成**: [astro-bangumi](https://github.com/sf-yuzifu/astro-bangumi) - Bilibili 番剧追踪集成
 
 ## 快速开始
 
@@ -108,6 +110,8 @@ nav:
     url: "/tags/"
   - name: "项目"
     url: "/project/"
+  - name: "追番"
+    url: "/bangumi/"
   - name: "友链"
     url: "/friends/"
   - name: "关于"
@@ -233,6 +237,29 @@ music:
   volume: 0.3
   # 音乐 URL 在返回 JSON 中的字段路径，用 . 分隔层级
   urlField: "data.url"
+
+# 追番配置
+bangumi:
+  # 是否启用
+  enable: true
+  # 页面配置
+  page:
+    title: "我的追番"
+    description: "追番快乐！我收藏的番剧都在这里"
+  # 集成配置
+  integration:
+    vmid: "你的Bilibili UID"  # Bilibili UID
+    title: "追番列表"
+    lazyload: true
+    coverMirror: ""  # 图片镜像，解决403问题
+    category: [1, 2]  # 1=番剧, 2=影视
+  # 组件配置
+  component:
+    categoryFilter: "all"  # 'all' | '1' | '2'
+    show: 1  # 0=想看, 1=在看, 2=看过
+    title: ""
+    quote: ""
+    darkSelector: "html:not([theme='dark'])"
 ```
 
 ## 文章配置
@@ -275,6 +302,7 @@ image: /blog-placeholder-1.jpg  # 封面图片
 - [vitepress-theme-sakura](https://github.com/flaribbit/vitepress-theme-sakura) - 提供参考
 - [spine-runtimes](https://github.com/esotericsoftware/spine-runtimes) - Spine 动画运行时
 - [Resource Han Rounded](https://github.com/CyanoHao/Resource-Han-Rounded) - 字体资源
+- [hexo-bilibili-bangumi](https://github.com/HCLonely/hexo-bilibili-bangumi) - 追番功能灵感来源
 
 ## License
 

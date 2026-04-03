@@ -17,7 +17,11 @@ export async function getStaticPaths() {
       // 过滤出包含当前 tag 的文章
       posts: posts
         .filter((post) => post.data.tags?.includes(tag))
-        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+        .sort((a, b) => {
+          const dateA = a.data.pubDate?.valueOf() || 0;
+          const dateB = b.data.pubDate?.valueOf() || 0;
+          return dateB - dateA;
+        }),
     },
   }));
 }

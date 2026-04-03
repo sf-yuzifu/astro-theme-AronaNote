@@ -22,3 +22,18 @@ const bangumiConfig = getBangumiConfig();
     darkSelector={bangumiConfig.component.darkSelector}
   />
 </Layout>
+
+<style lang="less">
+  :global(.bangumi-container) {
+    --bangumi-bg: var(--foreground-color) !important;
+    --bangumi-bg-secondary: var(--general-background-color) !important;
+    --bangumi-text: var(--font-color-grey) !important;
+    --bangumi-text-secondary: var(--font-color-grey) !important;
+    --bangumi-text-muted: rgba(var(--blue-shadow-color), 0.6) !important;
+    --bangumi-border: rgba(var(--blue-shadow-color), 0.2) !important;
+    --bangumi-shadow: rgba(var(--blue-shadow-color), 0.1) !important;
+    --bangumi-primary: var(--btn-background) !important;
+    --bangumi-primary-hover: var(--btn-hover) !important;
+    --bangumi-primary-text: var(--font-color-gold) !important;
+  }
+</style>

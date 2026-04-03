@@ -42,6 +42,8 @@ nav:
     url: "/tags/"
   - name: "项目"
     url: "/project/"
+  - name: "追番"
+    url: "/bangumi/"
   - name: "友链"
     url: "/friends/"
   - name: "关于"

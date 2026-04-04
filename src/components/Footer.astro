@@ -37,7 +37,7 @@ const icpList: ICPRecord[] = (() => {
           poweredList.map((obj, ind) => (
             <>
               <span class="powered-list">
-                <a href={obj.url}>{obj.name}</a>
+                <a href={obj.url} target="_blank" rel="noopener noreferrer">{obj.name}</a>
               </span>
               {ind < poweredList.length - 1 ? " & " : ""}
             </>

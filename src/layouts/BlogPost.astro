@@ -90,7 +90,7 @@ const enableWalinePageView = COMMENTS_ENABLE && COMMENTS_TYPE === "waline";
         <slot />
       </div>
     </article>
-    <!-- 右侧目录 -->
+    <!-- 右侧目录（桌面端） -->
     {headings.some((h) => h.depth >= 2 && h.depth <= 3) && (
       <aside class="toc-sidebar">
         <TableOfContents headings={headings} />
@@ -111,6 +111,11 @@ const enableWalinePageView = COMMENTS_ENABLE && COMMENTS_TYPE === "waline";
 
   <!-- 图片灯箱 -->
   <PhotoSwipe />
+
+  <!-- 移动端 TOC（放在 fixed-elements slot 中，确保 z-index 生效） -->
+  {headings.some((h) => h.depth >= 2 && h.depth <= 3) && (
+    <TableOfContents headings={headings} mobileOnly slot="fixed-elements" />
+  )}
 </BaseLayout>
 
 <style lang="less" is:global>

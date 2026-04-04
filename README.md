@@ -4,6 +4,8 @@
 
 基于 Astro 构建的个人博客主题，灵感来自 Blue Archive 游戏风格。
 
+**预览**: [arona-note.netlify.app](https://arona-note.netlify.app)
+
 **亮色模式：**
 
 ![亮色模式](images/light.png)
@@ -29,6 +31,9 @@
 - [x] Spine 模型动画（Arona / Plana / Kei / Aris）
   - [x] 点击语音播放
   - [x] 复制事件提示
+  - [x] 移动端自动隐藏
+  - [x] 桌面端透明度优化
+  - [x] 滚动到页脚自动抬升
 - [x] 首屏加载动画
 - [x] 夜间模式切换
 - [x] RSS 订阅
@@ -39,6 +44,8 @@
 - [x] 项目展示页面
 - [x] 背景音乐播放（Howler.js + 随机曲库）
 - [x] 文章目录导航 (TOC)
+  - [x] 桌面端侧边栏固定
+  - [x] 移动端底部弹窗
 - [x] PWA 支持（离线访问、自动更新）
 - [x] 键盘快捷键（`/` 打开搜索，`Esc` 关闭）
 - [x] Open Graph / SEO 优化

@@ -9,38 +9,26 @@ precacheAndRoute(self.__WB_MANIFEST);
 const OFFLINE_PAGE = '/offline/index.html';
 const PAGE_CACHE = 'pages-cache';
 
-const networkFirstStrategy = new NetworkFirst({
-  cacheName: PAGE_CACHE,
-  networkTimeoutSeconds: 10,
-  plugins: [
-    new CacheableResponsePlugin({
-      statuses: [0, 200],
-    }),
-    new ExpirationPlugin({
-      maxEntries: 50,
-      maxAgeSeconds: 60 * 60 * 24 * 7,
-    }),
-  ],
-});
-
 const navigationRoute = new NavigationRoute(async ({ event }) => {
   const request = event.request;
   
   try {
-    const response = await networkFirstStrategy.handle({ event, request });
+    const response = await fetch(request);
     
-    if (response && response.status === 200) {
-      return response;
-    }
-    
-    const cachedOffline = await matchPrecache(OFFLINE_PAGE);
-    if (cachedOffline) {
-      return cachedOffline;
+    if (response.ok) {
+      const responseClone = response.clone();
+      const cache = await caches.open(PAGE_CACHE);
+      await cache.put(request, responseClone);
     }
     
     return response;
   } catch (error) {
     console.log('Network request failed, serving offline page:', error);
+    
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
     
     const cachedOffline = await matchPrecache(OFFLINE_PAGE);
     if (cachedOffline) {

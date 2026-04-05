@@ -7,13 +7,12 @@
   import PhotoSwipeLightbox from "photoswipe/lightbox";
 
   let lightboxInstance: any = null;
+  let imageElements: HTMLImageElement[] = [];
+  let loadListeners: Map<HTMLImageElement, () => void> = new Map();
 
   function initPhotoSwipe() {
-    // 清理旧的实例
-    if (lightboxInstance) {
-      lightboxInstance.destroy();
-      lightboxInstance = null;
-    }
+    // 清理旧的实例和监听器
+    cleanup();
 
     // 获取文章容器中的所有图片
     const content = document.querySelector(".content");
@@ -22,39 +21,58 @@
     const images = content.querySelectorAll("img");
     if (images.length === 0) return;
 
-    // 为每个图片创建画廊数据
-    const galleryItems = Array.from(images).map((img) => {
-      // 确保图片有 data-pswp-width 和 data-pswp-height
-      if (!img.dataset.pswpWidth || !img.dataset.pswpHeight) {
-        // 如果图片已加载，使用实际尺寸
-        if (img.complete && img.naturalWidth) {
-          img.dataset.pswpWidth = String(img.naturalWidth);
-          img.dataset.pswpHeight = String(img.naturalHeight);
-        }
-      }
+    imageElements = Array.from(images) as HTMLImageElement[];
 
-      // 添加点击样式
+    // 为每个图片设置尺寸并添加监听
+    imageElements.forEach((img) => {
       img.style.cursor = "zoom-in";
 
-      return {
+      // 如果图片已加载完成
+      if (img.complete && img.naturalWidth > 0) {
+        img.dataset.pswpWidth = String(img.naturalWidth);
+        img.dataset.pswpHeight = String(img.naturalHeight);
+      } else {
+        // 监听图片加载完成
+        const onLoad = () => {
+          if (img.naturalWidth > 0) {
+            img.dataset.pswpWidth = String(img.naturalWidth);
+            img.dataset.pswpHeight = String(img.naturalHeight);
+            // 重新初始化灯箱
+            createLightbox();
+          }
+        };
+        img.addEventListener("load", onLoad);
+        loadListeners.set(img, onLoad);
+      }
+    });
+
+    // 初始化灯箱
+    createLightbox();
+  }
+
+  function createLightbox() {
+    // 销毁旧实例
+    if (lightboxInstance) {
+      lightboxInstance.destroy();
+      lightboxInstance = null;
+    }
+
+    // 构建有效的画廊项目
+    const validItems = imageElements
+      .filter((img) => {
+        const width = parseInt(img.dataset.pswpWidth || "0");
+        const height = parseInt(img.dataset.pswpHeight || "0");
+        return width > 0 && height > 0;
+      })
+      .map((img) => ({
         src: img.src,
         width: parseInt(img.dataset.pswpWidth || "0"),
         height: parseInt(img.dataset.pswpHeight || "0"),
         alt: img.alt || "",
         element: img,
-      };
-    });
+      }));
 
-    // 过滤掉没有尺寸信息的图片
-    const validItems = galleryItems.filter(
-      (item) => item.width > 0 && item.height > 0,
-    );
-
-    if (validItems.length === 0) {
-      // 如果图片还没有加载完成，等待加载后再初始化
-      setTimeout(initPhotoSwipe, 500);
-      return;
-    }
+    if (validItems.length === 0) return;
 
     // 初始化 PhotoSwipe
     lightboxInstance = new PhotoSwipeLightbox({
@@ -71,13 +89,41 @@
 
     // 点击图片时打开灯箱
     validItems.forEach((item, index) => {
-      item.element?.addEventListener("click", (e) => {
-        e.preventDefault();
-        lightboxInstance?.loadAndOpen(index);
-      });
+      // 移除旧的点击监听器（如果有）
+      item.element?.removeEventListener("click", handleImageClick);
+      // 添加新的点击监听器
+      item.element?.addEventListener("click", handleImageClick);
+      // 存储索引
+      if (item.element) {
+        (item.element as any).__pswpIndex = index;
+      }
     });
 
     lightboxInstance.init();
+  }
+
+  function handleImageClick(e: Event) {
+    e.preventDefault();
+    const img = e.currentTarget as HTMLImageElement & { __pswpIndex: number };
+    if (lightboxInstance && typeof img.__pswpIndex === "number") {
+      lightboxInstance.loadAndOpen(img.__pswpIndex);
+    }
+  }
+
+  function cleanup() {
+    // 移除所有 load 监听器
+    loadListeners.forEach((listener, img) => {
+      img.removeEventListener("load", listener);
+    });
+    loadListeners.clear();
+
+    // 销毁灯箱实例
+    if (lightboxInstance) {
+      lightboxInstance.destroy();
+      lightboxInstance = null;
+    }
+
+    imageElements = [];
   }
 
   // 页面加载完成后初始化
@@ -91,16 +137,11 @@
   document.addEventListener("astro:page-load", initPhotoSwipe);
 
   // 清理旧实例
-  document.addEventListener("astro:before-swap", () => {
-    if (lightboxInstance) {
-      lightboxInstance.destroy();
-      lightboxInstance = null;
-    }
-  });
+  document.addEventListener("astro:before-swap", cleanup);
 </script>
 
 <style is:global>
-  /* PhotoSwipe 自定义样式 - 内联以确保路由切换时可用 */
+  /* PhotoSwipe 自定义样式 */
   .pswp {
     --pswp-bg: rgba(0, 0, 0, 0.9);
     --pswp-placeholder-bg: rgba(0, 0, 0, 0.3);

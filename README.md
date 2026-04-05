@@ -106,7 +106,8 @@ site:
   description: "Welcome to my website!"
   author: "Your Name"
   avatar: "/theme/banner/avatar.webp"
-  favicon: "/favicon.svg"
+  favicon: "/favicon.ico"
+  faviconDark: "/favicon_dark.ico" # 暗色模式图标（可选）
   url: "https://example.com"
   lang: "zh-CN"
   # 备案信息（可选）

@@ -12,6 +12,7 @@ import {
   SITE_TITLE,
   SITE_AUTHOR,
   SITE_FAVICON,
+  SITE_FAVICON_DARK,
   SEO_OG_IMAGE,
   SEO_KEYWORDS,
   SEO_TWITTER,
@@ -45,7 +46,10 @@ const finalImage = image || ogImageUrl;
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 {SEO_KEYWORDS && <meta name="keywords" content={SEO_KEYWORDS.join(", ")} />}
 <link rel="icon" href="/favicon.ico" />
-<link rel="icon" href={SITE_FAVICON || "/favicon.svg"} />
+<link id="favicon-svg" rel="icon" href={SITE_FAVICON || "/favicon.svg"} />
+{SITE_FAVICON_DARK && (
+  <link id="favicon-svg-dark" rel="icon" href={SITE_FAVICON_DARK} media="(prefers-color-scheme: dark)" />
+)}
 {import.meta.env.PROD && (
   <>
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />

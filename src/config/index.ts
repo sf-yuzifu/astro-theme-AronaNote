@@ -22,6 +22,7 @@ export interface SiteConfig {
   author: string;
   avatar: string;
   favicon: string;
+  faviconDark?: string;
   url: string;
   lang: string;
   icp?: string | ICPRecord[];

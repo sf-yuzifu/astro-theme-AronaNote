@@ -8,7 +8,8 @@ site:
   description: "Welcome to my website!"
   author: "Your Name"
   avatar: "/theme/banner/avatar.webp"
-  favicon: "/favicon.svg"
+  favicon: "/favicon.ico"
+  faviconDark: "" # 暗色模式图标（可选）
   # 站点 URL，用于 RSS 和 SEO
   url: "https://example.com"
   # 语言设置

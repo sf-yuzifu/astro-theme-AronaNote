@@ -37,6 +37,7 @@ export const SITE_DESCRIPTION = siteConfig.description;
 export const SITE_AUTHOR = siteConfig.author;
 export const SITE_AVATAR = siteConfig.avatar;
 export const SITE_FAVICON = siteConfig.favicon;
+export const SITE_FAVICON_DARK = siteConfig.faviconDark;
 export const SITE_URL = siteConfig.url;
 export const SITE_LANG = siteConfig.lang;
 export const SITE_ICP = siteConfig.icp;

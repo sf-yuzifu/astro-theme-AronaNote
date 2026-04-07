@@ -7,14 +7,14 @@ const { isPost = false } = Astro.props;
 ---
 
 <div class="theme-select">
-  <span class="label">主题</span>
+  <span class="label" id="theme-select-label">主题</span>
   <div class="select-wrapper">
-    <select id="theme-select">
+    <select id="theme-select" aria-labelledby="theme-select-label" aria-label="主题选择">
       <option value="light">Arona</option>
       <option value="dark">Plana</option>
       <option value="system">System</option>
     </select>
-    <span class="select-arrow">▼</span>
+    <span class="select-arrow" aria-hidden="true">▼</span>
   </div>
 </div>
 

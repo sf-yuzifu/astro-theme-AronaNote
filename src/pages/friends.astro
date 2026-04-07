@@ -2,7 +2,8 @@
 import { Icon } from "astro-icon/components";
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { SITE_TITLE, SITE_DESCRIPTION, FRIENDS, FRIENDS_TITLE, FRIENDS_DESCRIPTION, FRIENDS_ENABLE } from "../consts";
+import WalineComment from "../components/WalineComment.astro";
+import { SITE_TITLE, SITE_DESCRIPTION, SITE_AVATAR, SITE_FAVICON, SITE_URL, FRIENDS, FRIENDS_TITLE, FRIENDS_DESCRIPTION, FRIENDS_ENABLE } from "../consts";
 
 // 从配置文件读取友链配置
 const friendsTitle = FRIENDS_TITLE || "友情链接";
@@ -28,6 +29,10 @@ function isExternalUrl(url: string): boolean {
 
   <!-- 友链列表 -->
   <div class="friends-container">
+    <h2 class="friends-list-title">
+      <Icon name="ph:link-bold" class="info-icon" />
+      友链列表
+    </h2>
     <ul class="friends-list">
       {
         FRIENDS.map((friend) => (
@@ -55,15 +60,53 @@ function isExternalUrl(url: string): boolean {
       }
     </ul>
 
+    <!-- 本站信息 -->
+    <div class="my-info-section">
+      <h2>
+        <Icon name="ph:info-bold" class="info-icon" />
+        本站信息
+      </h2>
+      <div class="my-info-card">
+        <div class="my-info-avatar">
+          {isExternalUrl(SITE_AVATAR) ? (
+            <img src={SITE_AVATAR} alt={SITE_TITLE} class="avatar-img" loading="lazy" />
+          ) : (
+            <Image src={SITE_AVATAR} alt={SITE_TITLE} class="avatar-img" width={56} height={56} />
+          )}
+        </div>
+        <div class="my-info-content">
+          <div class="my-info-item">
+            <span class="label">博客名称</span>
+            <span class="value">{SITE_TITLE}</span>
+          </div>
+          <div class="my-info-item">
+            <span class="label">博客地址</span>
+            <span class="value">{SITE_URL}</span>
+          </div>
+          <div class="my-info-item">
+            <span class="label">博客图标</span>
+            <span class="value">{isExternalUrl(SITE_FAVICON) ? SITE_FAVICON : `${SITE_URL}${SITE_FAVICON}`}</span>
+          </div>
+          <div class="my-info-item">
+            <span class="label">博客介绍</span>
+            <span class="value">{SITE_DESCRIPTION}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- 申请友链提示 -->
     <div class="apply-section">
       <h2>
         <Icon name="ph:hand-waving-bold" class="wave-icon" />
         交换友链
       </h2>
-      <p>欢迎申请友链！请通过 About 页面的联系方式与我联系。</p>
+      <p>欢迎申请友链！请通过下面评论或者首页的联系方式与我联系。</p>
     </div>
   </div>
+
+  <!-- 评论区 -->
+  <WalineComment />
 </BaseLayout>
 )}
 
@@ -132,6 +175,22 @@ function isExternalUrl(url: string): boolean {
       background-image:
         linear-gradient(90deg, rgba(207, 198, 254, 0.08) 3%, transparent 0),
         linear-gradient(1turn, rgba(207, 198, 254, 0.08) 3%, transparent 0);
+    }
+  }
+
+  .friends-list-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: var(--font-color-grey);
+
+    .info-icon {
+      width: 24px;
+      height: 24px;
+      color: var(--font-color-gold);
     }
   }
 
@@ -240,6 +299,79 @@ function isExternalUrl(url: string): boolean {
     }
   }
 
+  .my-info-section {
+    margin-bottom: 32px;
+
+    h2 {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin: 0 0 20px 0;
+      font-size: 20px;
+      color: var(--font-color-grey);
+
+      .info-icon {
+        width: 24px;
+        height: 24px;
+        color: var(--font-color-gold);
+      }
+    }
+  }
+
+  .my-info-card {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 24px;
+    background-color: var(--infobox-background-initial);
+    border-radius: 16px;
+    border: solid 2px var(--font-color-gold);
+    box-shadow: 0px 0px 8px rgb(var(--blue-shadow-color), 0.3);
+
+    .my-info-avatar {
+      flex-shrink: 0;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: solid 2px var(--font-color-gold);
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+    }
+
+    .my-info-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .my-info-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .label {
+        flex-shrink: 0;
+        width: 70px;
+        font-size: 14px;
+        font-weight: bold;
+        color: var(--font-color-grey);
+      }
+
+      .value {
+        font-size: 14px;
+        color: var(--font-color-grey);
+        word-break: break-all;
+      }
+    }
+  }
+
   .apply-section {
     text-align: center;
     padding: 32px;
@@ -278,6 +410,10 @@ function isExternalUrl(url: string): boolean {
       margin: 0 12px;
     }
 
+    .friends-list-title {
+      font-size: 18px;
+    }
+
     .friends-list {
       .friend-card {
         a {
@@ -314,6 +450,37 @@ function isExternalUrl(url: string): boolean {
         .arrow-icon {
           width: 16px;
           height: 16px;
+        }
+      }
+    }
+
+    .my-info-section {
+      h2 {
+        font-size: 18px;
+      }
+    }
+
+    .my-info-card {
+      flex-direction: column;
+      text-align: center;
+      gap: 16px;
+      padding: 20px;
+
+      .my-info-avatar {
+        width: 56px;
+        height: 56px;
+      }
+
+      .my-info-content {
+        gap: 10px;
+      }
+
+      .my-info-item {
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          width: auto;
         }
       }
     }

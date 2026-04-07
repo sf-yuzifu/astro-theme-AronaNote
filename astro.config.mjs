@@ -14,6 +14,7 @@ import rehypeKatex from "rehype-katex";
 import icon from "astro-icon";
 import Font from "vite-plugin-font";
 import { configReloadIntegration } from "./src/integrations/configReload.ts";
+import { robotsTxtIntegration } from "./src/integrations/robotsTxt.ts";
 import { loadConfig } from "./src/config/index.ts";
 import bangumi from "astro-bangumi";
 
@@ -75,6 +76,7 @@ export default defineConfig({
     sitemap(),
     icon(),
     configReloadIntegration(),
+    robotsTxtIntegration({ siteUrl: config.site.url }),
     bangumi({
       vmid: config.bangumi.integration.vmid,
       title: config.bangumi.integration.title,

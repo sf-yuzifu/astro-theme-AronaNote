@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import yaml from "js-yaml";
+import type { BangumiSource } from "astro-bangumi";
 
 // 配置文件路径（项目根目录）
 const CONFIG_PATH = path.resolve("config.yml");
@@ -178,11 +179,18 @@ export interface BangumiPageConfig {
 }
 
 export interface BangumiIntegrationConfig {
+  source: BangumiSource;
   vmid: string;
   title: string;
-  lazyload: boolean;
+  quote: string;
   coverMirror: string;
   category: (1 | 2)[];
+  lazyload: boolean;
+  devMode: boolean;
+  refreshEndpoint: string | false;
+  showMyComment: boolean;
+  localDataPath: string | undefined;
+  extraOrder: number;
 }
 
 export interface BangumiComponentConfig {
@@ -318,7 +326,20 @@ export function getBangumiConfig(): BangumiConfig {
   return config.bangumi || {
     enable: false,
     page: { title: "我的追番", description: "" },
-    integration: { vmid: "", title: "追番列表", lazyload: true, coverMirror: "", category: [1, 2] },
+    integration: {
+      source: "bili" as BangumiSource,
+      vmid: "",
+      title: "追番列表",
+      quote: "生命不息，追番不止！",
+      coverMirror: "",
+      category: [1, 2],
+      lazyload: true,
+      devMode: true,
+      refreshEndpoint: "/api/bangumi/refresh",
+      showMyComment: false,
+      localDataPath: undefined,
+      extraOrder: 0,
+    },
     component: { categoryFilter: "all", show: 1, title: "", quote: "", darkSelector: "" }
   };
 }

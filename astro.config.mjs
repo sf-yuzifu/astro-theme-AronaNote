@@ -77,13 +77,7 @@ export default defineConfig({
     icon(),
     configReloadIntegration(),
     robotsTxtIntegration({ siteUrl: config.site.url }),
-    bangumi({
-      vmid: config.bangumi.integration.vmid,
-      title: config.bangumi.integration.title,
-      lazyload: config.bangumi.integration.lazyload,
-      coverMirror: config.bangumi.integration.coverMirror,
-      category: config.bangumi.integration.category,
-    }),
+    bangumi(config.bangumi.integration),
     AstroPWA({
       registerType: "autoUpdate",
       manifest: {
